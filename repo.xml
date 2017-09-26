@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta xmlns="http://exist-db.org/xquery/repo">
+    <description>WeGA WebApp library</description>
+    <author>Carl-Maria-von-Weber-Gesamtausgabe</author>
+    <website>https://github.com/Edirom/WeGA-WebApp-lib</website>
+    <status>dev</status>
+    <license>MIT</license>
+    <copyright>true</copyright>
+    <type>library</type>
+    <target>WeGA-WebApp-lib</target>
+    <!--<prepare>pre-install.xql</prepare>-->
+    <!--<finish>post-install.xql</finish>-->
+<!--    <permissions user="guest" password="guest" group="guest" mode="rw-rw-r-\-"/>-->
+</meta>
