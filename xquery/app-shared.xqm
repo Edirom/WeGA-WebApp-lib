@@ -2,12 +2,11 @@ xquery version "3.1" encoding "UTF-8";
 
 module namespace app-shared="http://xquery.weber-gesamtausgabe.de/modules/app-shared";
 
-declare namespace tei="http://www.tei-c.org/ns/1.0";
-declare namespace mei="http://www.music-encoding.org/ns/mei";
-
 import module namespace functx="http://www.functx.com";
+import module namespace str="http://xquery.weber-gesamtausgabe.de/modules/str" at "str.xqm";
 import module namespace templates="http://exist-db.org/xquery/templates" at "/db/apps/shared-resources/content/templates.xql";
 
+declare variable $app-shared:FUNCTION_LOOKUP_ERROR := QName("http://xquery.weber-gesamtausgabe.de/modules/app-shared", "FunctionLookupError");
 
 (:~
  : Set an attribute to the value given in the $model map
@@ -60,8 +59,6 @@ declare
  : A non-wrapping alternative to the standard templates:each()
  : Gets rid of the superfluous first list item
  : 
- : At present, only $callbackArity=2 is supported
- :
  : @author Peter Stadler
  :)
 declare 
@@ -73,8 +70,8 @@ declare
         if($max castable as xs:integer and $max != '0') then subsequence($model($from), 1, $max)
         else $model($from)
     let $callbackFunc := 
-        try { function-lookup(xs:QName($callback), xs:int($callbackArity)) } 
-        catch * { core:logToFile('error', 'Failed to lookup function "' || $callback ) }
+        try { function-lookup(xs:QName($callback), 2) } 
+        catch * { error($app-shared:FUNCTION_LOOKUP_ERROR, 'Failed to lookup function "' || $callback || '". Error code was "' || $err:code || '". Error message was "' || $err:description || '".') }
     return (
         for $item in $items
         return 
