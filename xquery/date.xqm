@@ -9,7 +9,7 @@ declare namespace tei="http://www.tei-c.org/ns/1.0";
 declare namespace mei="http://www.music-encoding.org/ns/mei";
 declare namespace pdr="http://pdr.bbaw.de/namespaces/pdrws/";
 
-(:import module namespace datetime="http://exist-db.org/xquery/datetime" at "java:org.exist.xquery.modules.datetime.DateTimeModule";:)
+import module namespace datetime="http://exist-db.org/xquery/datetime" at "java:org.exist.xquery.modules.datetime.DateTimeModule";
 import module namespace functx="http://www.functx.com";
 
 declare variable $date:DATE_FORMAT_ERROR := QName("http://xquery.weber-gesamtausgabe.de/modules/date", "DateFormatError");
@@ -111,7 +111,11 @@ declare function date:printDate($date as element(tei:date)?, $lang as xs:string,
         let $from       := if($date/@from) then date:getCastableDate(data($date/@from),false()) else()
         let $to         := if($date/@to)  then date:getCastableDate(data($date/@to),true()) else()
         let $myDate := 
-            if($date/@when) then date:format-date(date:getCastableDate($date/@when,true()), $picture-string, $lang)
+            if($date/@when) then 
+                if($date/@when castable as xs:date) then date:format-date($date/@when, $picture-string, $lang)
+                else if($date/@when castable as xs:gYear) then string($date/@when)
+                else if($date/@when castable as xs:dateTime) then date:format-date(datetime:date-from-dateTime($date/@when), $picture-string, $lang)
+                else error($date:DATE_FORMAT_ERROR, 'unsupported value for @when: "' || $date/@when || '".')
             else if(exists($notBefore)) then 
                 if(exists($notAfter)) then 
                     if(year-from-date($notBefore) eq year-from-date($notAfter)) then 

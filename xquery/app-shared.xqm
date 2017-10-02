@@ -1,12 +1,23 @@
 xquery version "3.1" encoding "UTF-8";
 
+(:~
+ : XQuery functions supplementing the eXist-db templating module
+~:)
 module namespace app-shared="http://xquery.weber-gesamtausgabe.de/modules/app-shared";
+declare namespace templates="http://exist-db.org/xquery/templates";
 
 import module namespace functx="http://www.functx.com";
 import module namespace str="http://xquery.weber-gesamtausgabe.de/modules/str" at "str.xqm";
-import module namespace templates="http://exist-db.org/xquery/templates" at "/db/apps/shared-resources/content/templates.xql";
 
 declare variable $app-shared:FUNCTION_LOOKUP_ERROR := QName("http://xquery.weber-gesamtausgabe.de/modules/app-shared", "FunctionLookupError");
+
+(:~
+ : Looking for the templates:process() function from the templating module
+ : This module is a prerequisite for our supplement module 
+~:)
+declare variable $app-shared:templates-process := 
+    try { function-lookup(xs:QName('templates:process'), 2) }
+    catch * { error($app-shared:FUNCTION_LOOKUP_ERROR, 'Failed to lookup templates:process() from the eXist-db templating module. Error code was "' || $err:code || '". Error message was "' || $err:description || '".') };
 
 (:~
  : Set an attribute to the value given in the $model map
@@ -17,7 +28,7 @@ declare function app-shared:set-attr($node as node(), $model as map(*), $attr as
     element {name($node)} {
         $node/@*[not(name(.) = $attr)],
         attribute {$attr} {$model($key)},
-        templates:process($node/node(), $model)
+        $app-shared:templates-process($node/node(), $model)
     }
 };
 
@@ -79,27 +90,47 @@ declare
             else 
                 element { node-name($node) } {
                     $node/@*,
-                    templates:process($node/node(), map:new(($model, map:entry($to, $item))))
+                    $app-shared:templates-process($node/node(), map:new(($model, map:entry($to, $item))))
                 }
     )
 };
 
+
 (:~
- : Processes the node only if some $key (value) exists in $model 
+ : Processes the node only if some $key exists in $model and its value is *not* the empty sequence, an empty string or false() 
  :
+ : @param $key the key to look for in the current $model. Multiple keys must be separated by whitespace only
+ : @param $wrap whether to include the current node in the output (defaults to 'yes')
+ : @param $or whether to search for with an logical OR when mulitple keys are given (defaults to 'yes')
  : @author Peter Stadler
  :)
 declare 
     %templates:default("wrap", "yes")
-    function app-shared:if-exists($node as node(), $model as map(*), $key as xs:string, $wrap as xs:string) as node()* {
-        if(count($model($key)) gt 0) then 
+    %templates:default("or", "yes")
+    function app-shared:if-exists($node as node(), $model as map(*), $key as xs:string, $wrap as xs:string, $or as xs:string) as node()* {
+        let $thisOr := $or = ('yes', 'true')
+        let $tokens := tokenize($key, '\s+')
+        let $output := function() {
             if($wrap = 'yes') then
                 element {node-name($node)} {
                     $node/@*,
-                    templates:process($node/node(), $model)
+                    $app-shared:templates-process($node/node(), $model)
                 }
-            else templates:process($node/node(), $model)
-        else ()
+            else $app-shared:templates-process($node/node(), $model)
+        }
+        return
+        if($thisOr) then 
+            try {
+                if(some $token in $tokens satisfies not($model($token) castable as xs:string and replace(string($model($token)), 'false', '') = '')) then $output() 
+                else ()
+            }
+            catch * { $output() } 
+        else 
+            try {
+                if(every $token in $tokens satisfies not($model($token) castable as xs:string and replace(string($model($token)), 'false', '') = '')) then $output() 
+                else ()
+            }
+            catch * { () }
 };
 
 (:~
@@ -111,7 +142,7 @@ declare function app-shared:if-not-exists($node as node(), $model as map(*), $ke
     if(count($model($key)) eq 0) then 
         element {node-name($node)} {
             $node/@*,
-            templates:process($node/node(), $model)
+            $app-shared:templates-process($node/node(), $model)
         }
     else ()
 };
@@ -128,9 +159,9 @@ declare
             if($wrap = 'yes') then
                 element {node-name($node)} {
                     $node/@*,
-                    templates:process($node/node(), $model)
+                    $app-shared:templates-process($node/node(), $model)
                 }
-            else templates:process($node/node(), $model)
+            else $app-shared:templates-process($node/node(), $model)
         else ()
 };
 
@@ -151,16 +182,16 @@ declare
         else if($wrap = 'yes') then
             element {node-name($node)} {
                 $node/@*,
-                templates:process($node/node(), $model)
+                $app-shared:templates-process($node/node(), $model)
             }
-        else templates:process($node/node(), $model)
+        else $app-shared:templates-process($node/node(), $model)
 };
 
 declare function app-shared:order-list-items($node as node(), $model as map(*)) as element() {
     element {node-name($node)} {
         $node/@*,
         for $child in $node/node()
-        let $childProcessed := templates:process($child, $model)
+        let $childProcessed := $app-shared:templates-process($child, $model)
         order by str:normalize-space($childProcessed)
         return $childProcessed
     }
