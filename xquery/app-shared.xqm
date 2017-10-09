@@ -101,10 +101,12 @@ declare
 (:~
  : Processes the node only if some $key exists in $model and its value is *not* the empty sequence, an empty string or false() 
  :
+ : @param $node the current node to process from the HTML template
+ : @parma $model the current model that's passed on by the templating module
  : @param $key the key to look for in the current $model. Multiple keys must be separated by whitespace only
  : @param $wrap whether to include the current node in the output (defaults to 'yes')
  : @param $or whether to search for with an logical OR when mulitple keys are given (defaults to 'yes')
- : @author Peter Stadler
+ : @return the processed $node if the ckech was succesful, the empty sequence otherwise
  :)
 declare 
     %templates:default("wrap", "yes")
@@ -132,26 +134,34 @@ declare
 (:~
  : Processes the node only if some $key (value) *not* exists in $model 
  :
- : @author Peter Stadler
+ : @param $node the current node to process from the HTML template
+ : @parma $model the current model that's passed on by the templating module
+ : @param $key the key to look for in the current $model. Multiple keys must be separated by whitespace only
+ : @param $wrap whether to include the current node in the output (defaults to 'yes')
+ : @param $or whether to check with an logical OR when mulitple keys are given (defaults to 'yes')
+ : @return the processed $node if the ckech was succesful, the empty sequence otherwise
  :)
-declare function app-shared:if-not-exists($node as node(), $model as map(*), $key as xs:string, $wrap as xs:string, $or as xs:string) as node()? {
-    let $thisOr := $or = ('yes', 'true')
-        let $tokens := tokenize($key, '\s+')
-        let $output := function() {
-            if($wrap = 'yes') then
-                element {node-name($node)} {
-                    $node/@*,
-                    $app-shared:templates-process($node/node(), $model)
-                }
-            else $app-shared:templates-process($node/node(), $model)
-        }
-    return
-        if($thisOr) then 
-            if(some $token in $tokens satisfies not(wega-util-shared:has-content($model($token)))) then $output() 
-            else ()
-        else 
-            if(every $token in $tokens satisfies not(wega-util-shared:has-content($model($token)))) then $output() 
-            else ()
+declare 
+    %templates:default("wrap", "yes")
+    %templates:default("or", "yes")
+    function app-shared:if-not-exists($node as node(), $model as map(*), $key as xs:string, $wrap as xs:string, $or as xs:string) as node()? {
+        let $thisOr := $or = ('yes', 'true')
+            let $tokens := tokenize($key, '\s+')
+            let $output := function() {
+                if($wrap = 'yes') then
+                    element {node-name($node)} {
+                        $node/@*,
+                        $app-shared:templates-process($node/node(), $model)
+                    }
+                else $app-shared:templates-process($node/node(), $model)
+            }
+        return
+            if($thisOr) then 
+                if(some $token in $tokens satisfies not(wega-util-shared:has-content($model($token)))) then $output() 
+                else ()
+            else 
+                if(every $token in $tokens satisfies not(wega-util-shared:has-content($model($token)))) then $output() 
+                else ()
 };
 
 (:~
