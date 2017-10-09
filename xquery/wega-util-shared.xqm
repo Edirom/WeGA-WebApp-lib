@@ -15,6 +15,22 @@ declare function wega-util-shared:doc-available($uri as xs:string?) as xs:boolea
 };
 
 (:~
+ :  A helper function for checking for content built on fn:boolean()
+ :  Content is defined as non-zero, non-whitespace-only, non-false() and is recursively applied to maps and arrays
+~:)
+declare function wega-util-shared:has-content($items as item()*) as xs:boolean {
+    some $item in $items satisfies
+    typeswitch($item)
+    case array(*) return some $i in $item?* satisfies wega-util-shared:has-content($i)
+    case map(*) return some $i in map:keys($item) satisfies wega-util-shared:has-content($item($i))
+    case attribute() return ( if(normalize-space($item) castable as xs:double) then wega-util-shared:has-content(xs:double(normalize-space($item))) else wega-util-shared:has-content(string($item)) )
+    case element() return ( if(normalize-space($item) castable as xs:double) then wega-util-shared:has-content(xs:double(normalize-space($item))) else wega-util-shared:has-content(string($item)) )
+    case xs:string return normalize-space($item) != ''
+    case function(*) return true()
+    default return boolean($item)
+};
+
+(:~
  : Helper function for guessing a mime-type from a file extension
  : (Should be expanded to read in $exist.home$/mime-types.xml)
  :

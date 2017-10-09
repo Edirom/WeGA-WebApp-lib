@@ -5,9 +5,11 @@ xquery version "3.1" encoding "UTF-8";
 ~:)
 module namespace app-shared="http://xquery.weber-gesamtausgabe.de/modules/app-shared";
 declare namespace templates="http://exist-db.org/xquery/templates";
+declare namespace dev-app="http://xquery.weber-gesamtausgabe.de/modules/dev/dev-app";
 
 import module namespace functx="http://www.functx.com";
 import module namespace str="http://xquery.weber-gesamtausgabe.de/modules/str" at "str.xqm";
+import module namespace wega-util-shared="http://xquery.weber-gesamtausgabe.de/modules/wega-util-shared" at "wega-util-shared.xqm";
 
 declare variable $app-shared:FUNCTION_LOOKUP_ERROR := QName("http://xquery.weber-gesamtausgabe.de/modules/app-shared", "FunctionLookupError");
 
@@ -120,17 +122,11 @@ declare
         }
         return
         if($thisOr) then 
-            try {
-                if(some $token in $tokens satisfies not($model($token) castable as xs:string and replace(string($model($token)), 'false', '') = '')) then $output() 
-                else ()
-            }
-            catch * { $output() } 
+            if(some $token in $tokens satisfies wega-util-shared:has-content($model($token))) then $output() 
+            else ()
         else 
-            try {
-                if(every $token in $tokens satisfies not($model($token) castable as xs:string and replace(string($model($token)), 'false', '') = '')) then $output() 
-                else ()
-            }
-            catch * { () }
+            if(every $token in $tokens satisfies wega-util-shared:has-content($model($token))) then $output() 
+            else ()
 };
 
 (:~
@@ -138,13 +134,24 @@ declare
  :
  : @author Peter Stadler
  :)
-declare function app-shared:if-not-exists($node as node(), $model as map(*), $key as xs:string) as node()? {
-    if(count($model($key)) eq 0) then 
-        element {node-name($node)} {
-            $node/@*,
-            $app-shared:templates-process($node/node(), $model)
+declare function app-shared:if-not-exists($node as node(), $model as map(*), $key as xs:string, $wrap as xs:string, $or as xs:string) as node()? {
+    let $thisOr := $or = ('yes', 'true')
+        let $tokens := tokenize($key, '\s+')
+        let $output := function() {
+            if($wrap = 'yes') then
+                element {node-name($node)} {
+                    $node/@*,
+                    $app-shared:templates-process($node/node(), $model)
+                }
+            else $app-shared:templates-process($node/node(), $model)
         }
-    else ()
+    return
+        if($thisOr) then 
+            if(some $token in $tokens satisfies not(wega-util-shared:has-content($model($token)))) then $output() 
+            else ()
+        else 
+            if(every $token in $tokens satisfies not(wega-util-shared:has-content($model($token)))) then $output() 
+            else ()
 };
 
 (:~
