@@ -47,3 +47,25 @@ declare function wega-util-shared:guess-mimeType-from-suffix($suffix as xs:strin
         case 'txt' return 'text/plain'
         default return ()
 };
+
+(:~
+ : Sort TEI elements by their cert-attribute (e.g. <tei:date cert="medium"/>)
+ : NB: items without cert-attribute will rank the highest, followed by 'high', 'medium', 'low', 'unknown'
+ :
+ : @param $items the items to sort
+ : @return the sorted sequence of the items
+~:)
+declare function wega-util-shared:order-by-cert($items as item()*) as item()* {
+    let $order := map {
+        'high' := 1,
+        'medium' := 2,
+        'low' := 3,
+        'unknown' := 4,
+        '' := 0
+    }
+    return
+        for $i in $items
+        let $cert := $i/string(@cert)
+        order by $order($cert)
+        return $i
+};
