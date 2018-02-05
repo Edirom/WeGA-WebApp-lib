@@ -103,19 +103,28 @@ declare function date:format-date($date as xs:date, $picture as xs:string, $lang
  : @param $get-language-string a callback function that is expected to return a localized string for a given term
  : @return text
  :)
-declare function date:printDate($date as element(tei:date)?, $lang as xs:string, $get-language-string as function(xs:string, xs:string*) as xs:string, $get-picture-string as function(empty()) as xs:string) as xs:string? {
+declare function date:printDate($date as element()?, $lang as xs:string, $get-language-string as function(xs:string, xs:string*) as xs:string, $get-picture-string as function(empty()) as xs:string) as xs:string? {
     if($date) then (
         let $picture-string := $get-picture-string() (: if($lang = 'de') then '[D]. [MNn] [Y]' else '[MNn] [D], [Y]':)
         let $notBefore  := if($date/@notBefore) then date:getCastableDate(data($date/@notBefore),false()) else()
         let $notAfter   := if($date/@notAfter)  then date:getCastableDate(data($date/@notAfter),true()) else()
-        let $from       := if($date/@from) then date:getCastableDate(data($date/@from),false()) else()
-        let $to         := if($date/@to)  then date:getCastableDate(data($date/@to),true()) else()
+        let $from       := if($date/@from) then date:getCastableDate(data($date/@from),false()) 
+                           else if ($date/@from-iso) then date:getCastableDate(data($date/@from-iso),false())
+                           else()
+        let $to         := if($date/@to)  then date:getCastableDate(data($date/@to),true())
+                           else if ($date/@to-iso) then date:getCastableDate(data($date/@to-iso),false())                            
+                           else()        
         let $myDate := 
             if($date/@when) then 
                 if($date/@when castable as xs:date) then date:format-date($date/@when, $picture-string, $lang)
                 else if($date/@when castable as xs:gYear) then date:formatYear($date/@when, $lang)
                 else if($date/@when castable as xs:dateTime) then date:format-date(datetime:date-from-dateTime($date/@when), $picture-string, $lang)
-                else error($date:DATE_FORMAT_ERROR, 'unsupported value for @when: "' || $date/@when || '".')
+                else error($date:DATE_FORMAT_ERROR, 'unsupported value for @when: "' || $date/@when || '".')           
+             else if($date/@when-iso) then 
+                if($date/@when-iso castable as xs:date) then date:format-date($date/@when-iso, $picture-string, $lang)
+                else if($date/@when-iso castable as xs:gYear) then date:formatYear($date/@when-iso, $lang)
+                else if($date/@when-iso castable as xs:dateTime) then date:format-date(datetime:date-from-dateTime($date/@when-iso), $picture-string, $lang)
+                else error($date:DATE_FORMAT_ERROR, 'unsupported value for @when-iso: "' || $date/@when-iso || '".')            
             else if(exists($notBefore)) then 
                 if(exists($notAfter)) then 
                     if(year-from-date($notBefore) eq year-from-date($notAfter)) then 
