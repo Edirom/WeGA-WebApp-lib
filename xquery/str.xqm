@@ -23,7 +23,7 @@ declare function str:normalize-space($string as xs:string?) as xs:string {
         normalize-space(
             replace(
                 (: diverse Control Codes entsorgen, siehe https://en.wikipedia.org/wiki/List_of_Unicode_characters :)
-                replace($string, '&#27;|&#127;|&#128;', ' '),
+                replace($string, '&#27;|&#127;|&#128;', ''),
                 (: diversen Whitespace entsorgen, siehe https://en.wikipedia.org/wiki/Whitespace_character :)
                 '&#160;|&#8194;|&#8195;|&#8201;', ' '
             )
