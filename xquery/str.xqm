@@ -59,21 +59,6 @@ declare function str:printFornameSurname($name as xs:string?) as xs:string? {
 };
 
 (:~ 
- : Print forename surname from a TEI persName element
- : In contrast to str:printFornameSurname() this function checks the appearance of forenames, i.e.
- : <persName type="reg"><forename>Eugen</forename> <forename>Friedrich</forename> <forename>Heinrich</forename>, <roleName>Herzog</roleName> <nameLink>von</nameLink> Württemberg</persName>
- : is turned into "Eugen Friedrich Heinrich, Herzog von Württemberg" rather than "Herzog von Württemberg Eugen Friedrich Heinrich"
- :
- : @param $name a tei persName element
- : @author Peter Stadler
- : @return xs:string
- :)
-declare function str:printFornameSurnameFromTEIpersName($persName as element(tei:persName)?) as xs:string? {
-    if(($persName/element()[1])[self::tei:forename]) then str:normalize-space($persName)
-    else str:printFornameSurname(string($persName))
-};
-
-(:~ 
  : Surround a string with typographic double quotes
  :
  : @param $str the string to enquote
