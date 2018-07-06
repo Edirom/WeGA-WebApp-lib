@@ -50,7 +50,7 @@ declare function str:join-path-elements($segs as xs:string*) as xs:string {
  : @author Peter Stadler
  : @return xs:string
  :)
-declare function str:printFornameSurname($name as xs:string?) as xs:string? {
+declare function str:print-forename-surname($name as xs:string?) as xs:string? {
     let $clearName := str:normalize-space($name)
     return
         if(functx:number-of-matches($clearName, ',') eq 1)
