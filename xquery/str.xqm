@@ -19,7 +19,16 @@ import module namespace functx="http://www.functx.com";
  : @return xs:string
  :)
 declare function str:normalize-space($string as xs:string?) as xs:string {
-    normalize-unicode(normalize-space(replace($string, '&#160;|&#8194;|&#8195;|&#8201;', ' ')))
+    normalize-unicode(
+        normalize-space(
+            replace(
+                (: diverse Control Codes entsorgen, siehe https://en.wikipedia.org/wiki/List_of_Unicode_characters :)
+                replace($string, '&#27;|&#127;|&#128;', ''),
+                (: diversen Whitespace entsorgen, siehe https://en.wikipedia.org/wiki/Whitespace_character :)
+                '&#160;|&#8194;|&#8195;|&#8201;', ' '
+            )
+        )
+    )
 };
 
 (:~
@@ -41,27 +50,12 @@ declare function str:join-path-elements($segs as xs:string*) as xs:string {
  : @author Peter Stadler
  : @return xs:string
  :)
-declare function str:printFornameSurname($name as xs:string?) as xs:string? {
+declare function str:print-forename-surname($name as xs:string?) as xs:string? {
     let $clearName := str:normalize-space($name)
     return
         if(functx:number-of-matches($clearName, ',') eq 1)
         then normalize-space(string-join(reverse(tokenize($clearName, ',')), ' '))
         else $clearName
-};
-
-(:~ 
- : Print forename surname from a TEI persName element
- : In contrast to str:printFornameSurname() this function checks the appearance of forenames, i.e.
- : <persName type="reg"><forename>Eugen</forename> <forename>Friedrich</forename> <forename>Heinrich</forename>, <roleName>Herzog</roleName> <nameLink>von</nameLink> Württemberg</persName>
- : is turned into "Eugen Friedrich Heinrich, Herzog von Württemberg" rather than "Herzog von Württemberg Eugen Friedrich Heinrich"
- :
- : @param $name a tei persName element
- : @author Peter Stadler
- : @return xs:string
- :)
-declare function str:printFornameSurnameFromTEIpersName($persName as element(tei:persName)?) as xs:string? {
-    if(($persName/element()[1])[self::tei:forename]) then str:normalize-space($persName)
-    else str:printFornameSurname(string($persName))
 };
 
 (:~ 
