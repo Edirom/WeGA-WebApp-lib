@@ -1,7 +1,10 @@
 WeGA WebApp library
 ===================
 
-This is a library package for the [WeGA-WebApp](https://github.com/Edirom/WeGA-WebApp) with common XQuery functions that can be used standalone.
+[![GitHub](https://img.shields.io/github/license/edirom/WeGA-WebApp-lib.svg)](https://github.com/Edirom/WeGA-WebApp-lib/blob/develop/LICENSE)
+[![GitHub release](https://img.shields.io/github/release/edirom/WeGA-WebApp-lib.svg)](https://github.com/Edirom/WeGA-WebApp-lib/releases)
+
+This is a library package—originally for the [WeGA-WebApp](https://github.com/Edirom/WeGA-WebApp)—with common XQuery functions that can be used standalone.
 
 
 Prerequisites
