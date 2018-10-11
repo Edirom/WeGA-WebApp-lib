@@ -108,7 +108,7 @@ declare function date:format-date($date as xs:date, $picture as xs:string, $lang
  : @param $get-language-string a callback function that is expected to return a localized string for a given term
  : @return text
  :)
-declare function date:printDate($date as element()?, $lang as xs:string, $get-language-string as function(xs:string, xs:string*) as xs:string, $get-picture-string as function(empty()) as xs:string) as xs:string? {
+declare function date:printDate($date as element()?, $lang as xs:string, $get-language-string as function(xs:string, xs:string*) as xs:string, $get-picture-string as function() as xs:string) as xs:string? {
     if($date) then (
         let $picture-string := $get-picture-string() (: if($lang = 'de') then '[D]. [MNn] [Y]' else '[MNn] [D], [Y]':)
         let $notBefore  := if($date/@notBefore) then date:getCastableDate(data($date/@notBefore),false())
