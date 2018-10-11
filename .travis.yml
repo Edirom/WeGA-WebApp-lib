@@ -10,8 +10,8 @@ before_install:
   - ant xar
   - curl http://exist-db.org/exist/apps/public-repo/public/functx-1.0.xar -o build/functx-1.0.xar
   - curl http://exist-db.org/exist/apps/public-repo/public/shared-resources-0.8.2.xar -o build/shared-resources-0.8.2.xar
-  - docker run -d --name exist -vbuild:/opt/exist/autodeploy stadlerpeter/existdb
-  - sleep 20
+  - docker run -d --name exist -v`pwd`/build:/opt/exist/autodeploy stadlerpeter/existdb
+  - sleep 15
 
 script: 
   - docker exec -it exist curl "http://127.0.0.1:8080/exist/apps/WeGA-WebApp-lib/testing/run-tests.xql" 
