@@ -10,7 +10,12 @@ before_install:
   - docker run -d --name exist -p8080:8080 stadlerpeter/existdb
   - sleep 10
   - docker cp exist:/opt/exist/webapp/WEB-INF/data/secret.txt .
+  - mkdir -p existjars/lib
+  - docker cp -p exist:/opt/exist/lib/core existjars/lib/
+  - docker cp -p exist:/opt/exist/exist.jar existjars/
+  - docker cp -p exist:/opt/exist/exist-optional.jar existjars/
   - echo "exist.pass="`cat secret.txt` > local.build.properties
+  - echo "exist.home="`pwd`"/existjars" >> local.build.properties
   - ant deploy
 
 script: 
