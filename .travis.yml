@@ -12,7 +12,7 @@ before_install:
   - docker create --name exist stadlerpeter/existdb
   - for i in build/*.xar ; do docker cp $i exist:/opt/exist/autodeploy/ ; done
   - docker start exist
-  - sleep 25
+  - sleep 35
   - docker ps -a
   - echo "listing build dir"
   - ls -la build/
