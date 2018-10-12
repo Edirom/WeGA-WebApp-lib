@@ -13,6 +13,11 @@ before_install:
   - for i in build/*.xar ; do docker cp $i exist:/opt/exist/autodeploy/ ; done
   - docker start exist
   - sleep 25
+  - docker ps -a
+  - echo "listing build dir"
+  - ls -la build/
+  - echo "listing autodeploy inside container"
+  - docker exec -it exist ls -la autodeploy/
 
 script: 
   - docker exec -it exist curl "http://127.0.0.1:8080/exist/apps/WeGA-WebApp-lib/testing/run-tests.xql" 
