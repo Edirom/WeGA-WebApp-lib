@@ -13,13 +13,8 @@ before_install:
   - for i in build/*.xar ; do docker cp $i exist:/opt/exist/autodeploy/ ; done
   - docker start exist
   - sleep 35
-  - docker ps -a
-  - echo "listing build dir"
-  - ls -la build/
-  - echo "listing autodeploy inside container"
-  - docker exec -it exist ls -la autodeploy/
-  - docker exec -it exist cat webapp/WEB-INF/logs/expath-repo.log
   - docker exec -it exist cat webapp/WEB-INF/logs/exist.log
+  - docker exec -it exist curl "http://127.0.0.1:8080/exist/apps/WeGA-WebApp-lib/testing/run-tests.xql" > report.xml
 
 script: 
-  - docker exec -it exist curl "http://127.0.0.1:8080/exist/apps/WeGA-WebApp-lib/testing/run-tests.xql" 
+  - grep testsuite report.xml && (! grep 'failures="[1-9]' report.xml) 
