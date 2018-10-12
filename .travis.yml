@@ -18,6 +18,8 @@ before_install:
   - ls -la build/
   - echo "listing autodeploy inside container"
   - docker exec -it exist ls -la autodeploy/
+  - docker exec -it exist curl "http://127.0.0.1:8080/exist/apps/"
+  - docker exec -it exist curl "http://127.0.0.1:8080/exist/apps/WeGA-WebApp-lib/testing/run-tests.xql"
 
 script: 
   - docker exec -it exist curl "http://127.0.0.1:8080/exist/apps/WeGA-WebApp-lib/testing/run-tests.xql" 
