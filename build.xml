@@ -32,6 +32,7 @@
                 <include name="**"/>
                 <!-- with some exceptions … -->
                 <exclude name="build.xml"/>
+                <exclude name=".travis.yml"/>
                 <exclude name="build/**"/>
                 <exclude name="dist/**"/>
                 <exclude name="*build.properties"/>

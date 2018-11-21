@@ -32,20 +32,16 @@ declare function wega-util-shared:has-content($items as item()*) as xs:boolean {
 
 (:~
  : Helper function for guessing a mime-type from a file extension
- : (Should be expanded to read in $exist.home$/mime-types.xml)
+ : Relies on the file $exist.home$/mime-types.xml which gets uploaded during installation of this package
  :
  : @author Peter Stadler 
  : @param $suffix the file extension
  : @return the mime-type or the empty sequence when no match was found
  :)
 declare function wega-util-shared:guess-mimeType-from-suffix($suffix as xs:string) as xs:string? {
-    switch($suffix)
-        case 'xml' return 'application/xml'
-        case 'rdf' return 'application/rdf+xml'
-        case 'jpg' return 'image/jpeg'
-        case 'png' return 'image/png'
-        case 'txt' return 'text/plain'
-        default return ()
+    let $mime-types := doc('../mime-types.xml')
+    return
+        ($mime-types//extensions[contains(., $suffix)]/parent::mime-type/@name)[1]
 };
 
 (:~
