@@ -49,7 +49,7 @@ declare function wega-util-shared:has-content($items as item()*) as xs:boolean {
 declare function wega-util-shared:guess-mimeType-from-suffix($suffix as xs:string) as xs:string? {
     let $mime-types := doc('../mime-types.xml')
     return
-        ($mime-types//extensions[contains(., $suffix)]/parent::mime-type/@name)[1]
+        $mime-types//extensions[matches(., $suffix)]/parent::mime-type[not(contains(description, 'Deprecated'))]/@name
 };
 
 (:~
