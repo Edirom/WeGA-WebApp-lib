@@ -5,6 +5,7 @@ xquery version "3.1" encoding "UTF-8";
 ~:)
 module namespace my-cache="http://xquery.weber-gesamtausgabe.de/modules/cache";
 
+declare namespace output="http://www.w3.org/2010/xslt-xquery-serialization";
 import module namespace functx="http://www.functx.com";
 import module namespace wega-util-shared="http://xquery.weber-gesamtausgabe.de/modules/wega-util-shared" at "wega-util-shared.xqm";
 import module namespace cm="http://exist-db.org/xquery/cache" at "java:org.exist.xquery.modules.cache.CacheModule";
@@ -54,13 +55,9 @@ declare function my-cache:doc($docURI as xs:string, $callback as function() as i
                 let $mime-type := wega-util-shared:guess-mimeType-from-suffix(functx:substring-after-last($docURI, '.'))
                 let $store-file := my-cache:store-file($collection, $fileName, $content, $mime-type, ())
                 return 
-                    if(util:binary-doc-available($store-file)) then util:binary-doc($store-file)
-                    else if(wega-util-shared:doc-available($store-file)) then doc($store-file) 
-                    else ()
+                    my-cache:fetch-file($store-file)
             )
-            else if(util:binary-doc-available($docURI)) then util:binary-doc($docURI)
-            else if(wega-util-shared:doc-available($docURI)) then doc($docURI)
-            else ()
+            else my-cache:fetch-file($docURI)
         }
         catch * {
             $onFailure($err:code, $err:description)
@@ -129,9 +126,41 @@ declare %private function my-cache:store-file($collection as xs:string, $fileNam
         return 
             if(xmldb:collection-available($parentColl || '/' || $coll)) then ()
             else xmldb:create-collection($parentColl, $coll)
-    return
+    let $store-binary := function() {
+        if($onFailure) then 
+            try { xmldb:store-as-binary($collection, $fileName, $contents) }
+            catch * { $onFailure($err:code, $err:description) }
+        else xmldb:store-as-binary($collection, $fileName, $contents)
+    }
+    let $store-json := function() {
+        let $serialized-contents := serialize($contents, <output:serialization-parameters><output:method>json</output:method></output:serialization-parameters>)
+        return 
+            if($onFailure) then 
+                try { xmldb:store-as-binary($collection, $fileName, $serialized-contents) }
+                catch * { $onFailure($err:code, $err:description) }
+            else xmldb:store-as-binary($collection, $fileName, $serialized-contents)
+    }
+    let $store := function() {
         if($onFailure) then 
             try { xmldb:store($collection, $fileName, $contents, $mime-type) }
             catch * { $onFailure($err:code, $err:description) }
         else xmldb:store($collection, $fileName, $contents, $mime-type)
+    }
+    return
+        typeswitch($contents)
+        case node() return $store()
+        case xs:string return $store()
+        case map() return $store-json()
+        case array(*) return $store-json()
+        default return $store-binary()
+};
+
+(:~
+ : Helper function for my-cache:doc()
+ :)
+declare %private function my-cache:fetch-file($docURI as xs:string) as item()* {
+    if(wega-util-shared:doc-available($docURI)) then doc($docURI)
+    else if(wega-util-shared:json-doc-available($docURI)) then json-doc($docURI) (: needs to go before util:binary-doc-available() because JSON is treated as binary as well :)
+    else if(util:binary-doc-available($docURI)) then util:binary-doc($docURI)
+    else ()
 };

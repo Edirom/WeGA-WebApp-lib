@@ -15,6 +15,14 @@ declare function wega-util-shared:doc-available($uri as xs:string?) as xs:boolea
 };
 
 (:~
+ :  Checks whether the json resource identified by $uri is available.
+~:)
+declare function wega-util-shared:json-doc-available($uri as xs:string?) as xs:boolean {
+    try {exists(json-doc($uri))}
+    catch * {false()}
+};
+
+(:~
  :  A helper function for checking for content built on fn:boolean()
  :  Content is defined as non-zero, non-whitespace-only, non-false() and is recursively applied to maps and arrays
 ~:)
