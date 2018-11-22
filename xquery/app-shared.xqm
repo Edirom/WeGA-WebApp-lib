@@ -2,7 +2,7 @@ xquery version "3.1" encoding "UTF-8";
 
 (:~
  : XQuery functions supplementing the eXist-db templating module
-~:)
+ :)
 module namespace app-shared="http://xquery.weber-gesamtausgabe.de/modules/app-shared";
 declare namespace templates="http://exist-db.org/xquery/templates";
 declare namespace dev-app="http://xquery.weber-gesamtausgabe.de/modules/dev/dev-app";
@@ -16,7 +16,7 @@ declare variable $app-shared:FUNCTION_LOOKUP_ERROR := QName("http://xquery.weber
 (:~
  : Looking for the templates:process() function from the templating module
  : This module is a prerequisite for our supplement module 
-~:)
+ :)
 declare variable $app-shared:templates-process := 
     try { function-lookup(xs:QName('templates:process'), 2) }
     catch * { error($app-shared:FUNCTION_LOOKUP_ERROR, 'Failed to lookup templates:process() from the eXist-db templating module. Error code was "' || $err:code || '". Error message was "' || $err:description || '".') };
@@ -112,10 +112,9 @@ declare
     %templates:default("wrap", "yes")
     %templates:default("or", "yes")
     function app-shared:if-exists($node as node(), $model as map(*), $key as xs:string, $wrap as xs:string, $or as xs:string) as node()* {
-        let $thisOr := $or = ('yes', 'true')
         let $tokens := tokenize($key, '\s+')
         let $output := function() {
-            if($wrap = 'yes') then
+            if(wega-util-shared:semantic-boolean($wrap)) then
                 element {node-name($node)} {
                     $node/@*,
                     $app-shared:templates-process($node/node(), $model)
@@ -123,7 +122,7 @@ declare
             else $app-shared:templates-process($node/node(), $model)
         }
         return
-        if($thisOr) then 
+        if(wega-util-shared:semantic-boolean($or)) then 
             if(some $token in $tokens satisfies wega-util-shared:has-content($model($token))) then $output() 
             else ()
         else 
@@ -145,12 +144,9 @@ declare
     %templates:default("wrap", "yes")
     %templates:default("or", "yes")
     function app-shared:if-not-exists($node as node(), $model as map(*), $key as xs:string, $wrap as xs:string, $or as xs:string) as node()? {
-        let $thisOr := 
-            if($or castable as xs:boolean) then xs:boolean($or)
-            else false()
         let $tokens := tokenize($key, '\s+')
         let $output := function() {
-            if($wrap = 'yes') then
+            if(wega-util-shared:semantic-boolean($wrap)) then
                 element {node-name($node)} {
                     $node/@*,
                     $app-shared:templates-process($node/node(), $model)
@@ -158,7 +154,7 @@ declare
             else $app-shared:templates-process($node/node(), $model)
         }
         return
-            if($thisOr) then 
+            if(wega-util-shared:semantic-boolean($or)) then 
                 if(some $token in $tokens satisfies not(wega-util-shared:has-content($model($token)))) then $output() 
                 else ()
             else 
@@ -175,7 +171,7 @@ declare
     %templates:default("wrap", "yes")
     function app-shared:if-matches($node as node(), $model as map(*), $key as xs:string, $value as xs:string, $wrap as xs:string) as item()* {
         if($model($key) castable as xs:string and string($model($key)) = tokenize($value, '\s+')) then
-            if($wrap = 'yes') then
+            if(wega-util-shared:semantic-boolean($wrap)) then
                 element {node-name($node)} {
                     $node/@*,
                     $app-shared:templates-process($node/node(), $model)
@@ -198,7 +194,7 @@ declare
     %templates:default("wrap", "yes")
     function app-shared:if-not-matches($node as node(), $model as map(*), $key as xs:string, $value as xs:string, $wrap as xs:string) as item()* {
         if($model($key) castable as xs:string and string($model($key)) = tokenize($value, '\s+')) then ()
-        else if($wrap = 'yes') then
+        else if(wega-util-shared:semantic-boolean($wrap)) then
             element {node-name($node)} {
                 $node/@*,
                 $app-shared:templates-process($node/node(), $model)
@@ -206,6 +202,14 @@ declare
         else $app-shared:templates-process($node/node(), $model)
 };
 
+(:~
+ : Order list items by their string value
+ : (used for navigation lists)
+ :
+ : @param $node the processed $node from the html template (a default param from the templating module)
+ : @param $model a map (a default param from the templating module)
+ : @return the ordered elements
+ :)
 declare function app-shared:order-list-items($node as node(), $model as map(*)) as element() {
     element {node-name($node)} {
         $node/@*,
@@ -219,7 +223,7 @@ declare function app-shared:order-list-items($node as node(), $model as map(*)) 
 (:~
  : Outputs the raw value of $key, e.g. some HTML fragment 
  : that's not being wrapped with the $node element but replaces it.
-~:)
+ :)
 declare function app-shared:output($node as node(), $model as map(*), $key as xs:string) as item()* {
     $model($key)
 };

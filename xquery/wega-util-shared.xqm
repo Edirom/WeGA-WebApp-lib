@@ -2,13 +2,13 @@ xquery version "3.1" encoding "UTF-8";
 
 (:~
  : XQuery module with utility functions 
-~:)
+ :)
 module namespace wega-util-shared="http://xquery.weber-gesamtausgabe.de/modules/wega-util-shared";
 
 (:~
  :  A slight modification of the standard XPath function fn:doc-available()
  :  which will return false() for binary documents instead of failing
-~:)
+ :)
 declare function wega-util-shared:doc-available($uri as xs:string?) as xs:boolean {
     try {doc-available($uri)}
     catch * {false()}
@@ -16,7 +16,7 @@ declare function wega-util-shared:doc-available($uri as xs:string?) as xs:boolea
 
 (:~
  :  Checks whether the json resource identified by $uri is available.
-~:)
+ :)
 declare function wega-util-shared:json-doc-available($uri as xs:string?) as xs:boolean {
     try {exists(json-doc($uri))}
     catch * {false()}
@@ -25,7 +25,7 @@ declare function wega-util-shared:json-doc-available($uri as xs:string?) as xs:b
 (:~
  :  A helper function for checking for content built on fn:boolean()
  :  Content is defined as non-zero, non-whitespace-only, non-false() and is recursively applied to maps and arrays
-~:)
+ :)
 declare function wega-util-shared:has-content($items as item()*) as xs:boolean {
     some $item in $items satisfies
     typeswitch($item)
@@ -47,9 +47,9 @@ declare function wega-util-shared:has-content($items as item()*) as xs:boolean {
  : @return the mime-type or the empty sequence when no match was found
  :)
 declare function wega-util-shared:guess-mimeType-from-suffix($suffix as xs:string) as xs:string? {
-    let $mime-types := doc('../mime-types.xml')
+    let $extensions := doc('../mime-types.xml')//extensions
     return
-        $mime-types//extensions[matches(., $suffix)]/parent::mime-type[not(contains(description, 'Deprecated'))]/@name
+        ($extensions[(tokenize(., ',\s*') = concat('.', $suffix))]/parent::mime-type)[1]/@name
 };
 
 (:~
@@ -58,7 +58,7 @@ declare function wega-util-shared:guess-mimeType-from-suffix($suffix as xs:strin
  :
  : @param $items the items to sort
  : @return the sorted sequence of the items
-~:)
+ :)
 declare function wega-util-shared:order-by-cert($items as item()*) as item()* {
     let $order := map {
         'high' := 1,
@@ -72,4 +72,18 @@ declare function wega-util-shared:order-by-cert($items as item()*) as item()* {
         let $cert := $i/string(@cert)
         order by $order($cert)
         return $i
+};
+
+(:~
+ : Try to cast a given item to xs:string and check its semantic boolean value
+ : 
+ : @param $item the item to check
+ : @return true() for 'yes', '1', or 'true', false() otherwise
+ :)
+declare function wega-util-shared:semantic-boolean($item as item()) as xs:boolean {
+    let $true-strings := ('yes', '1', 'true')
+    return
+        if($item castable as xs:string)
+        then normalize-space($item) = $true-strings
+        else false()
 };
