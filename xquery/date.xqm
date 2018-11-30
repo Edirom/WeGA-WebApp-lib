@@ -62,10 +62,16 @@ declare %private function date:getCastableDate($date as xs:string, $latest as xs
  : @param $year the year as (positive or negative) integer
  : @param $lang the language switch (en|de)
  : @return xs:string
+ : 
+ : @editor Christian Schaper
+ : added CE for low years after 0
  :)
 declare function date:formatYear($year as xs:int, $lang as xs:string) as xs:string {
-    if($year gt 0) then $year cast as xs:string
-    else if($lang eq 'en') then concat($year*-1,' BC')
+    if($year gt 100) then $year cast as xs:string
+    else if($year gt 0) then
+        if ($lang eq 'en') then concat ($year*1, ' CE')
+        else concat ($year*1, ' n.&#8239;Chr.')
+    else if($lang eq 'en') then concat($year*-1,' BCE')
     else concat($year*-1,' v.&#8239;Chr.')
 };
 
