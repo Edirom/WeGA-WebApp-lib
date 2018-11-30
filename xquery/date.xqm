@@ -157,7 +157,7 @@ declare function date:printDate($date as element()?, $lang as xs:string, $get-la
                     if(year-from-date($notBefore) eq year-from-date($notAfter)) then 
                         if(month-from-date($notBefore) eq month-from-date($notAfter)) then 
                             if(day-from-date($notBefore) = 1 and day-from-date($notAfter) = functx:days-in-month($notAfter)) then concat($get-language-string(concat('month',month-from-date($notAfter)),$lang),' ',date:formatYear(year-from-date($notAfter), $lang)) (: August 1879 :)
-                            else $get-language-string('dateBetween',(xs:string(day-from-date($notBefore)),date:format-date($notAfter,$picture-string, $lang))) (: Zwischen 1. und 7. August 1801 :)
+                            else $get-language-string('dateBetween',(date:format-date($notBefore,'[D].',$lang),date:format-date($notAfter,$picture-string, $lang))) (: Zwischen 1. und 7. August 1801 :)
                         else if(ends-with($notBefore, '01-01') and ends-with($notAfter, '12-31')) then date:formatYear(year-from-date($notBefore), $lang) (: 1879 :)
                         else if($notBefore_o castable as xs:gYearMonth) then
                             if($notAfter_o castable as xs:gYearMonth) then $get-language-string('dateBetween',(xs:string(date:format-date($notBefore,'[MNn]', $lang)),date:format-date($notAfter,'[MNn] [Y]', $lang))) (: Zwischen Mai und August 1909 :)
@@ -187,13 +187,13 @@ declare function date:printDate($date as element()?, $lang as xs:string, $get-la
                     if(year-from-date($from) eq year-from-date($to)) then 
                         if(month-from-date($from) eq month-from-date($to)) then 
                             if(day-from-date($from) = 1 and day-from-date($to) = functx:days-in-month($to)) then date:format-date($from,'[MNn] [Y]', $lang) (: August 1879 :)
-                            else $get-language-string('fromTo',(xs:string(day-from-date($from)),date:format-date($to,$picture-string, $lang))) (: Vom 1. bis 7. August 1801 :)
+                            else $get-language-string('noFromTo',(date:format-date($from,'[D].',$lang),date:format-date($to,$picture-string, $lang))) (: 1. bis 7. August 1801 :)                            
                         else if(ends-with($from, '01-01') and ends-with($to, '12-31')) then date:formatYear(year-from-date($from), $lang) (: 1879 :)
                         else if($from_o castable as xs:gYearMonth) then
                             if($to_o castable as xs:gYearMonth) then $get-language-string('noFromTo',(date:format-date($from,'[MNn]', $lang),date:format-date($to,'[MNn] [Y]', $lang))) (: Mai bis August 1909 :)
                             else $get-language-string('noFromTo',(date:format-date($from,'[MNn]', $lang),date:format-date($to,$picture-string, $lang))) (: Mai bis 8. August 1909 :)
                         else if($to_o castable as xs:gYearMonth) then $get-language-string('noFromTo',(replace(date:format-date($from,$picture-string, $lang), '(,\s+)?' || date:formatYear(year-from-date($from), $lang), ''), date:format-date($to,'[MNn] [Y]', $lang))) (: 4. Juli bis August 1789 :)
-                        else $get-language-string('fromTo', (replace(date:format-date($from,$picture-string, $lang), '(,\s+)?' || date:formatYear(year-from-date($from), $lang), ''), date:format-date($to,$picture-string, $lang))) (: Vom 1. Juli bis 4. August 1789 :)
+                        else $get-language-string('noFromTo', (replace(date:format-date($from,$picture-string, $lang), '(,\s+)?' || date:formatYear(year-from-date($from), $lang), ''), date:format-date($to,$picture-string, $lang))) (: 1. Juli bis 4. August 1789 :)
                     else if($from_o castable as xs:gYear) then
                         if($to_o castable as xs:gYear) then $get-language-string('noFromTo',(date:formatYear(year-from-date($from), $lang),date:formatYear(year-from-date($to), $lang))) (: 1879 bis 1881 :)
                         else if($to_o castable as xs:gYearMonth) then $get-language-string('noFromTo',(date:formatYear(year-from-date($from), $lang),date:format-date($to,'[MNn] [Y]', $lang))) (: 1879 bis März 1881 :)
