@@ -54,7 +54,7 @@ declare function str:print-forename-surname($name as xs:string?) as xs:string? {
     let $clearName := str:normalize-space($name)
     return
         if(functx:number-of-matches($clearName, ',') eq 1)
-        then normalize-space(string-join(reverse(tokenize($clearName, ',')), ' '))
+        then replace(normalize-space(string-join(reverse(tokenize($clearName, ',')), ' ')), '\sd’\s', ' d’') (: bei Namensteil "d’" kein folgendes Leerzeichen :)        
         else $clearName
 };
 
