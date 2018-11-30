@@ -24,8 +24,8 @@ declare variable $date:DATE_FORMAT_ERROR := QName("http://xquery.weber-gesamtaus
  : @return the constructed date as xs:date or empty
  :)
 declare function date:getOneNormalizedDate($date as element()?, $latest as xs:boolean) as xs:date? {
-    if($latest) then max($date/@* ! date:getCastableDate(., $latest))
-    else min($date/@* ! date:getCastableDate(., $latest))
+    if($latest) then max($date/@* ! date:getCastableDate(functx:substring-after-if-contains(., '/'), $latest))
+    else min($date/@* ! date:getCastableDate(functx:substring-before-if-contains(., '/'), $latest))
 };
 
 
