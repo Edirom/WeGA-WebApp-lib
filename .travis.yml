@@ -18,3 +18,6 @@ before_install:
 
 script: 
   - grep testsuite report.xml && (! grep 'failures="[1-9]' report.xml) && (! grep 'errors="[1-9]' report.xml) 
+
+after_failure:
+  - cat report.xml
