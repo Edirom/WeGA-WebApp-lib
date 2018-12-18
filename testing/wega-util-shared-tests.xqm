@@ -71,12 +71,20 @@ declare %test:assertFalse function wust:test-has-content-zeroNaN() as xs:boolean
 
 declare %test:assertFalse function wust:test-has-content-empty-map() as xs:boolean {
     wega-util-shared:has-content(map {'foo': ()}) or
-    wega-util-shared:has-content(map {}) 
+    wega-util-shared:has-content(map {}) and
+    not(
+        wega-util-shared:has-content(map {'foo': 'bar'}) and
+        wega-util-shared:has-content(map {'foo': (), 'bli': 'bar'})
+    )
 };
 
 declare %test:assertTrue function wust:test-has-content-map() as xs:boolean {
     wega-util-shared:has-content(map {'foo': 'bar'}) and
-    wega-util-shared:has-content(map {'foo': (), 'foo': 'bar'}) 
+    wega-util-shared:has-content(map {'foo': (), 'bli': 'bar'}) and 
+    not(
+        wega-util-shared:has-content(map {'foo': ()}) or
+        wega-util-shared:has-content(map {}) 
+    )
 };
 
 declare %test:assertTrue function wust:test-has-content-function() as xs:boolean {
