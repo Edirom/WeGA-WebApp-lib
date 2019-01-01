@@ -114,20 +114,14 @@ declare
     %templates:default("or", "yes")
     function app-shared:if-exists($node as node(), $model as map(*), $key as xs:string, $wrap as xs:string, $or as xs:string) as node()* {
         let $tokens := tokenize($key, '\s+')
-        let $output := function() {
-            if(wega-util-shared:semantic-boolean($wrap)) then
-                element {node-name($node)} {
-                    $node/@*,
-                    $app-shared:templates-process($node/node(), $model)
-                }
-            else $app-shared:templates-process($node/node(), $model)
-        }
         return
         if(wega-util-shared:semantic-boolean($or)) then 
-            if(some $token in $tokens satisfies wega-util-shared:has-content($model($token))) then $output() 
+            if(some $token in $tokens satisfies wega-util-shared:has-content($model($token))) 
+            then app-shared:wrap($node, $app-shared:templates-process($node/node(), $model), $wrap) 
             else ()
         else 
-            if(every $token in $tokens satisfies wega-util-shared:has-content($model($token))) then $output() 
+            if(every $token in $tokens satisfies wega-util-shared:has-content($model($token))) 
+            then app-shared:wrap($node, $app-shared:templates-process($node/node(), $model), $wrap) 
             else ()
 };
 
@@ -146,20 +140,14 @@ declare
     %templates:default("or", "yes")
     function app-shared:if-not-exists($node as node(), $model as map(*), $key as xs:string, $wrap as xs:string, $or as xs:string) as node()? {
         let $tokens := tokenize($key, '\s+')
-        let $output := function() {
-            if(wega-util-shared:semantic-boolean($wrap)) then
-                element {node-name($node)} {
-                    $node/@*,
-                    $app-shared:templates-process($node/node(), $model)
-                }
-            else $app-shared:templates-process($node/node(), $model)
-        }
         return
             if(wega-util-shared:semantic-boolean($or)) then 
-                if(some $token in $tokens satisfies not(wega-util-shared:has-content($model($token)))) then $output() 
+                if(some $token in $tokens satisfies not(wega-util-shared:has-content($model($token)))) 
+                then app-shared:wrap($node, $app-shared:templates-process($node/node(), $model), $wrap) 
                 else ()
             else 
-                if(every $token in $tokens satisfies not(wega-util-shared:has-content($model($token)))) then $output() 
+                if(every $token in $tokens satisfies not(wega-util-shared:has-content($model($token)))) 
+                then app-shared:wrap($node, $app-shared:templates-process($node/node(), $model), $wrap) 
                 else ()
 };
 
@@ -172,12 +160,7 @@ declare
     %templates:default("wrap", "yes")
     function app-shared:if-matches($node as node(), $model as map(*), $key as xs:string, $value as xs:string, $wrap as xs:string) as item()* {
         if($model($key) castable as xs:string and string($model($key)) = tokenize($value, '\s+')) then
-            if(wega-util-shared:semantic-boolean($wrap)) then
-                element {node-name($node)} {
-                    $node/@*,
-                    $app-shared:templates-process($node/node(), $model)
-                }
-            else $app-shared:templates-process($node/node(), $model)
+            app-shared:wrap($node, $app-shared:templates-process($node/node(), $model), $wrap)
         else ()
 };
 
@@ -195,12 +178,7 @@ declare
     %templates:default("wrap", "yes")
     function app-shared:if-not-matches($node as node(), $model as map(*), $key as xs:string, $value as xs:string, $wrap as xs:string) as item()* {
         if($model($key) castable as xs:string and string($model($key)) = tokenize($value, '\s+')) then ()
-        else if(wega-util-shared:semantic-boolean($wrap)) then
-            element {node-name($node)} {
-                $node/@*,
-                $app-shared:templates-process($node/node(), $model)
-            }
-        else $app-shared:templates-process($node/node(), $model)
+        else app-shared:wrap($node, $app-shared:templates-process($node/node(), $model), $wrap)
 };
 
 (:~
@@ -228,7 +206,7 @@ declare function app-shared:order-list-items($node as node(), $model as map(*)) 
  : @param $node the processed $node from the html template (a default param from the templating module)
  : @param $model a map (a default param from the templating module)
  : @param $key the key in $model to look for
- : @param $wrap whether to copy the node $node to the output or to replace it with $model?key (default is )
+ : @param $wrap whether to copy the node $node to the output or to replace it with $model?key (default is "no")
 ~:)
 declare 
     %templates:default("wrap", "no")
@@ -238,8 +216,22 @@ declare
             case map(*) return serialize($model($key), <output:serialization-parameters><output:method>json</output:method></output:serialization-parameters> )
             case array(*) return serialize($model($key), <output:serialization-parameters><output:method>json</output:method></output:serialization-parameters> )
             default return $model($key)
-        return
-        if(wega-util-shared:semantic-boolean($wrap)) then
-            element {node-name($node)} { $out }
-        else $out
+        return app-shared:wrap($node, $out, $wrap)
+};
+
+(:~
+ : Check if necessary, and wrap content in $node
+ : Helper function for various functions above
+ : 
+ : @param $node the processed $node from the html template (a default param from the templating module)
+ : @param $content the (new) content
+ : @param $wrap whether to copy the node $node to the output or to replace it with $model?key
+~:)
+declare %private function app-shared:wrap($node as node(), $content as item()*, $wrap as xs:string) {
+    if(wega-util-shared:semantic-boolean($wrap)) then
+        element {node-name($node)} {
+            $node/@*,
+            $content 
+        }
+    else $content
 };
