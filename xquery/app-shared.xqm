@@ -6,6 +6,7 @@ xquery version "3.1" encoding "UTF-8";
 module namespace app-shared="http://xquery.weber-gesamtausgabe.de/modules/app-shared";
 declare namespace templates="http://exist-db.org/xquery/templates";
 declare namespace dev-app="http://xquery.weber-gesamtausgabe.de/modules/dev/dev-app";
+declare namespace output="http://www.w3.org/2010/xslt-xquery-serialization";
 
 import module namespace functx="http://www.functx.com";
 import module namespace str="http://xquery.weber-gesamtausgabe.de/modules/str" at "str.xqm";
@@ -185,7 +186,7 @@ declare
  :
  : @param $node the processed $node from the html template (a default param from the templating module)
  : @param $model a map (a default param from the templating module)
- : @param $key the key in $Model to look for
+ : @param $key the key in $model to look for
  : @param $value the value of $key to match
  : @param $wrap whether to copy the node $node to the output or just process the child nodes of $node  
  : @author Peter Stadler
@@ -222,8 +223,23 @@ declare function app-shared:order-list-items($node as node(), $model as map(*)) 
 
 (:~
  : Outputs the raw value of $key, e.g. some HTML fragment 
- : that's not being wrapped with the $node element but replaces it.
- :)
-declare function app-shared:output($node as node(), $model as map(*), $key as xs:string) as item()* {
-    $model($key)
+ : Maps and arrays will be serialized as JSON 
+ :
+ : @param $node the processed $node from the html template (a default param from the templating module)
+ : @param $model a map (a default param from the templating module)
+ : @param $key the key in $model to look for
+ : @param $wrap whether to copy the node $node to the output or to replace it with $model?key (default is )
+~:)
+declare 
+    %templates:default("wrap", "no")
+    function app-shared:output($node as node(), $model as map(*), $key as xs:string, $wrap as xs:string) as item()* {
+        let $out := 
+            typeswitch($model($key))
+            case map(*) return serialize($model($key), <output:serialization-parameters><output:method>json</output:method></output:serialization-parameters> )
+            case array(*) return serialize($model($key), <output:serialization-parameters><output:method>json</output:method></output:serialization-parameters> )
+            default return $model($key)
+        return
+        if(wega-util-shared:semantic-boolean($wrap)) then
+            element {node-name($node)} { $out }
+        else $out
 };
