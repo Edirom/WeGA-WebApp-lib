@@ -12,7 +12,7 @@ before_install:
   - docker create --name exist stadlerpeter/existdb
   - for i in build/*.xar ; do docker cp $i exist:/opt/exist/autodeploy/ ; done
   - docker start exist
-  - sleep 35
+  - i=0 ; while (! docker inspect exist | grep -e Status....healthy) ; do if ((i > 30)) ; then echo ' **** timeout ... aborting **** ' ; exit 1 ; else sleep 5 ; echo waiting for container ... ; i=$((i+1)) ; fi ; done
   - docker exec -it exist cat webapp/WEB-INF/logs/exist.log
   - docker exec -it exist curl "http://127.0.0.1:8080/exist/apps/WeGA-WebApp-lib/testing/run-tests.xql" > report.xml
 
