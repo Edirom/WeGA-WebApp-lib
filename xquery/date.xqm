@@ -38,7 +38,7 @@ declare function date:getOneNormalizedDate($date as element()?, $latest as xs:bo
  : @author Peter Stadler
  : @param $date the date to test as xs:string
  : @param $latest if $latest is set to true() the last day of the year will be returned
- : @return the (constructed) date as xs:date, empty() if no conversion is possible
+ : @return the (constructed) date as xs:date, empty-sequence() if no conversion is possible
  :)
 declare %private function date:getCastableDate($date as xs:string, $latest as xs:boolean) as xs:date? {
     if($date castable as xs:date) then xs:date($date)

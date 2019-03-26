@@ -39,7 +39,7 @@ declare function my-cache:doc($docURI as xs:string, $callback as function() as i
         case xs:dayTimeDuration return
             ($currentDateTimeOfFile + $lease) lt current-dateTime()
             or empty($currentDateTimeOfFile)
-        case empty() return true() 
+        case empty-sequence() return true() 
         case function() as xs:boolean return $lease($currentDateTimeOfFile)
         default return error($my-cache:UNSUPPORTED_PARAMETER_VALUE_ERROR, 'The parameter value for $lease must be xs:dayTimeDuration()? or a function reference which must take exactly one argument.')
     return 
