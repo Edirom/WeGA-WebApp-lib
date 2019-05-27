@@ -16,8 +16,8 @@ declare
     %test:args("1317-11", "true")           %test:assertEquals("1317-11-30")
     %test:args("1817-05", "false")          %test:assertEquals("1817-05-01")
     %test:args("-1817-11", "false")         %test:assertEquals("-1817-11-01")
-    %test:args("1999-05-31T13:20:00-05:00", "false")         %test:assertEquals("1999-05-31")
-    %test:args("-1999-05-31T13:20:00-05:00", "false")        %test:assertEquals("-1999-05-31")
+    %test:args("1999-05-31T13:20:00-05:00", "false")         %test:assertEquals("1999-05-31-05:00")
+    %test:args("-1999-05-31T13:20:00-05:00", "false")        %test:assertEquals("-1999-05-31-05:00")
     function dt:test-getOneNormalizedDate-when($date as xs:string, $latest as xs:boolean) as xs:date? {
     let $dateElement := <tei:date when="{$date}"/>
     return
