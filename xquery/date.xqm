@@ -1,4 +1,4 @@
-xquery version "3.0" encoding "UTF-8";
+xquery version "3.1" encoding "UTF-8";
 
 (:~
  : XQuery module for processing dates
@@ -9,7 +9,6 @@ declare namespace tei="http://www.tei-c.org/ns/1.0";
 declare namespace mei="http://www.music-encoding.org/ns/mei";
 declare namespace pdr="http://pdr.bbaw.de/namespaces/pdrws/";
 
-import module namespace datetime="http://exist-db.org/xquery/datetime" at "java:org.exist.xquery.modules.datetime.DateTimeModule";
 import module namespace functx="http://www.functx.com";
 
 declare variable $date:DATE_FORMAT_ERROR := QName("http://xquery.weber-gesamtausgabe.de/modules/date", "DateFormatError");
@@ -43,8 +42,7 @@ declare function date:getOneNormalizedDate($date as element()?, $latest as xs:bo
 declare %private function date:getCastableDate($date as xs:string, $latest as xs:boolean) as xs:date? {
     if($date castable as xs:date) then xs:date($date)
     else if($date castable as xs:dateTime) then
-        if(starts-with($date, '-')) then xs:date(substring($date, 1, 11))
-        else xs:date(substring($date, 1, 10))
+        xs:date(xs:dateTime($date))
     else if($date castable as xs:gYear) then 
         if($latest) then xs:date(concat($date,'-12-31'))
         else xs:date(concat($date,'-01-01'))
@@ -141,7 +139,7 @@ declare function date:printDate($date as element()?, $lang as xs:string, $get-la
                 else if($date/@when castable as xs:gYearMonth) then date:format-date(date:getCastableDate(data($date/@when),true()),'[MNn] [Y]', $lang)
                 else if($date/@when castable as xs:gMonthDay) then $get-language-string('noYear',xs:string(date:format-date(date:getCastableDate(data($date/@when),true()),'[D]. [MNn]', $lang)))
                 else if($date/@when castable as xs:gDay) then $get-language-string('noYearMonth',xs:string(date:format-date(date:getCastableDate(data($date/@when),true()),'[D].', $lang)))
-                else if($date/@when castable as xs:dateTime) then date:format-date(datetime:date-from-dateTime($date/@when), $picture-string, $lang)
+                else if($date/@when castable as xs:dateTime) then date:format-date(xs:date(xs:dateTime($date/@when)), $picture-string, $lang)
                 else error($date:DATE_FORMAT_ERROR, 'unsupported value for @when: "' || $date/@when || '".')
            (:  @when-iso für die busoni-app :)
              else if($date/@when-iso and not(contains($date/@when-iso, '/'))) then 
@@ -150,7 +148,7 @@ declare function date:printDate($date as element()?, $lang as xs:string, $get-la
                 else if($date/@when-iso castable as xs:gYearMonth) then date:format-date(date:getCastableDate(data($date/@when-iso),true()),'[MNn] [Y]', $lang)
                 else if($date/@when-iso castable as xs:gMonthDay) then $get-language-string('noYear',xs:string(date:format-date(date:getCastableDate(data($date/@when-iso),true()),'[D]. [MNn]', $lang)))
                 else if($date/@when-iso castable as xs:gDay) then $get-language-string('noYearMonth',xs:string(date:format-date(date:getCastableDate(data($date/@when-iso),true()),'[D].', $lang)))
-                else if($date/@when-iso castable as xs:dateTime) then date:format-date(datetime:date-from-dateTime($date/@when-iso), $picture-string, $lang)
+                else if($date/@when-iso castable as xs:dateTime) then date:format-date(xs:date(xs:dateTime($date/@when-iso)), $picture-string, $lang)
                 else error($date:DATE_FORMAT_ERROR, 'unsupported value for @when-iso: "' || $date/@when-iso || '".')                         
             else if(exists($notBefore)) then 
                 if(exists($notAfter)) then 
