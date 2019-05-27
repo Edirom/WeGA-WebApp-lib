@@ -8,6 +8,7 @@ module namespace date="http://xquery.weber-gesamtausgabe.de/modules/date";
 declare namespace tei="http://www.tei-c.org/ns/1.0";
 declare namespace mei="http://www.music-encoding.org/ns/mei";
 declare namespace pdr="http://pdr.bbaw.de/namespaces/pdrws/";
+declare namespace output="http://www.w3.org/2010/xslt-xquery-serialization";
 
 import module namespace functx="http://www.functx.com";
 
@@ -214,7 +215,7 @@ declare function date:printDate($date as element()?, $lang as xs:string, $get-la
             else $get-language-string('dateUnknown', ())
         return 
             if(exists($myDate)) then string($myDate)
-            else error($date:DATE_FORMAT_ERROR, string-join(('date:printDate()', 'wrong date format', util:serialize($date, ('method=text', 'media-type=text/plain', 'encoding=utf-8'))), ' ;; '))
+            else error($date:DATE_FORMAT_ERROR, string-join(('date:printDate()', 'wrong date format', serialize($date, <output:serialization-parameters><output:method>text</output:method></output:serialization-parameters>)), ' ;; '))
     )
     else ()
 };

@@ -7,6 +7,7 @@ module namespace app-shared="http://xquery.weber-gesamtausgabe.de/modules/app-sh
 declare namespace templates="http://exist-db.org/xquery/templates";
 declare namespace dev-app="http://xquery.weber-gesamtausgabe.de/modules/dev/dev-app";
 declare namespace output="http://www.w3.org/2010/xslt-xquery-serialization";
+declare namespace map="http://www.w3.org/2005/xpath-functions/map";
 
 import module namespace functx="http://www.functx.com";
 import module namespace str="http://xquery.weber-gesamtausgabe.de/modules/str" at "str.xqm";
@@ -89,11 +90,11 @@ declare
     return (
         for $item in $items
         return 
-            if(exists($callbackFunc)) then $callbackFunc($node, map:new(($model, map:entry($to, $item))))
+            if(exists($callbackFunc)) then $callbackFunc($node, map:merge(($model, map:entry($to, $item))))
             else 
                 element { node-name($node) } {
                     $node/@*,
-                    $app-shared:templates-process($node/node(), map:new(($model, map:entry($to, $item))))
+                    $app-shared:templates-process($node/node(), map:merge(($model, map:entry($to, $item))))
                 }
     )
 };
