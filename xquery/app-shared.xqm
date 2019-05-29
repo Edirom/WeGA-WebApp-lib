@@ -73,19 +73,23 @@ declare
  : A non-wrapping alternative to the standard templates:each()
  : Gets rid of the superfluous first list item
  : 
+ : @param $callback a callback function that will take two parameters ($node as node(), $model as map(*)) 
+ : @param $callbackNamespace the namespace of the callback function
  : @author Peter Stadler
  :)
 declare 
     %templates:default("max", "0")
     %templates:default("callback", "0")
-    %templates:default("callbackArity", "2")
-    function app-shared:each($node as node(), $model as map(*), $from as xs:string, $to as xs:string, $max as xs:string, $callback as xs:string, $callbackArity as xs:string) as node()* {
+    %templates:default("callbackNamespace", "")
+    function app-shared:each($node as node(), $model as map(*), $from as xs:string, $to as xs:string, $max as xs:string, $callback as xs:string, $callbackNamespace as xs:string) as node()* {
     let $items := 
         if($max castable as xs:integer and $max != '0') then subsequence($model($from), 1, $max)
         else $model($from)
     let $callbackFunc := 
-        try { function-lookup(xs:QName($callback), 2) } 
-        catch * { error($app-shared:FUNCTION_LOOKUP_ERROR, 'Failed to lookup function "' || $callback || '". Error code was "' || $err:code || '". Error message was "' || $err:description || '".') }
+        if($callback ne '0') then 
+            try { function-lookup(QName($callbackNamespace, $callback), 2) } 
+            catch * { error($app-shared:FUNCTION_LOOKUP_ERROR, 'Failed to lookup function "' || $callback || '". Error code was "' || $err:code || '". Error message was "' || $err:description || '".') }
+        else ()
     return (
         for $item in $items
         return 
