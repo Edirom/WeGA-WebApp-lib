@@ -5,7 +5,6 @@ xquery version "3.1" encoding "UTF-8";
  :)
 module namespace app-shared="http://xquery.weber-gesamtausgabe.de/modules/app-shared";
 declare namespace templates="http://exist-db.org/xquery/templates";
-declare namespace dev-app="http://xquery.weber-gesamtausgabe.de/modules/dev/dev-app";
 declare namespace output="http://www.w3.org/2010/xslt-xquery-serialization";
 declare namespace map="http://www.w3.org/2005/xpath-functions/map";
 
