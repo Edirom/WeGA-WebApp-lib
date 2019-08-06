@@ -61,11 +61,11 @@ declare function wega-util-shared:guess-mimeType-from-suffix($suffix as xs:strin
  :)
 declare function wega-util-shared:order-by-cert($items as item()*) as item()* {
     let $order := map {
-        'high' := 1,
-        'medium' := 2,
-        'low' := 3,
-        'unknown' := 4,
-        '' := 0
+        'high' : 1,
+        'medium' : 2,
+        'low' : 3,
+        'unknown' : 4,
+        '' : 0
     }
     return
         for $i in $items
