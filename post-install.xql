@@ -41,7 +41,7 @@ declare function local:mkcol($collection, $path) {
 local:mkcol("/db/system/config", $target),
 
 (: store mime-types.xml, needed for wega-util-shared:guess-mimeType-from-suffix() :)
-xdb:store($target, 'mime-types.xml', xs:anyURI(concat('file://', $home, '/mime-types.xml')), 'application/xml'),
+xdb:store($target, 'mime-types.xml', doc('https://raw.githubusercontent.com/eXist-db/exist/develop/exist-core/src/main/resources/org/exist/util/mime-types.xml'), 'application/xml'),
 
 (: store index configuration :)
 xdb:store(concat("/db/system/config/", $target), 'collection.xconf', xs:anyURI(concat('file://', $dir, '/collection.xconf')), 'application/xml'),
