@@ -5,9 +5,11 @@ import module namespace test="http://exist-db.org/xquery/xqsuite" at "resource:o
  
 import module namespace wust="http://xquery.weber-gesamtausgabe.de/modules/wega-util-shared-tests" at "wega-util-shared-tests.xqm";
 import module namespace dt="http://xquery.weber-gesamtausgabe.de/modules/date-tests" at "date-tests.xqm";
+import module namespace st="http://xquery.weber-gesamtausgabe.de/modules/str-tests" at "str-tests.xqm";
  
 (: the test:suite() function will run all the test-annotated functions in the module whose namespace URI you provide :)
 test:suite((
     util:list-functions("http://xquery.weber-gesamtausgabe.de/modules/date-tests"),
+    util:list-functions("http://xquery.weber-gesamtausgabe.de/modules/str-tests"),
     util:list-functions("http://xquery.weber-gesamtausgabe.de/modules/wega-util-shared-tests")
 ))
