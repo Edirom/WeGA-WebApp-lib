@@ -254,7 +254,10 @@ declare function date:rfc822($dateTime as xs:dateTime) as xs:string {
     let $day := functx:pad-integer-to-length(day-from-date($dateTime), 2)
     let $day.string := substring(format-date($dateTime,'[F]'), 1, 3)
     let $time := format-time($dateTime,"[H]:[m]:[s]")
-    let $timezone := translate(format-date($dateTime, '[Z]'), ':', '')
+    let $timezone := 
+        if(exists(timezone-from-dateTime($dateTime)))
+        then translate(format-date($dateTime, '[Z]'), ':', '')
+        else '+0000'
     return (
         $day.string ||', '|| $day || ' ' || $month || ' ' || $year || ' ' || $time || ' ' || $timezone
     )
