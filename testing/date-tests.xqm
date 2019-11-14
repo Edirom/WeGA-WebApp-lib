@@ -38,9 +38,10 @@ declare
 };
 
 declare 
-    %test:args("2002-10-02T15:00:00.040+02:00")     %test:assertEquals("Wed, 2 Oct 2002 15:00:00 +0200")
+    %test:args("2002-10-02T15:00:00.040+02:00")     %test:assertEquals("Wed, 02 Oct 2002 15:00:00 +0200")
     %test:args("2004-02-29T23:00:00.98077-09:00")   %test:assertEquals("Sun, 29 Feb 2004 23:00:00 -0900")
     %test:args("1969-01-12T15:00:00")               %test:assertEquals("Sun, 12 Jan 1969 15:00:00 +0000")
+    %test:args("1969-01-12T15:00:00Z")              %test:assertEquals("Sun, 12 Jan 1969 15:00:00 +0000")
     function dt:test-rfc822($dateTime as xs:dateTime) as xs:string {
         date:rfc822($dateTime)
 };
