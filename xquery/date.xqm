@@ -251,10 +251,13 @@ declare function date:gregorian2julian($date as xs:date) as xs:date? {
 declare function date:rfc822($dateTime as xs:dateTime) as xs:string {
     let $year := year-from-date($dateTime)
     let $month := substring(format-date($dateTime,'[MNn]'), 1, 3)
-    let $day := day-from-date($dateTime)
+    let $day := functx:pad-integer-to-length(day-from-date($dateTime), 2)
     let $day.string := substring(format-date($dateTime,'[F]'), 1, 3)
     let $time := format-time($dateTime,"[H]:[m]:[s]")
-    let $timezone := translate(format-date($dateTime, '[Z]'), ':', '')
+    let $timezone := 
+        if(exists(timezone-from-dateTime($dateTime)))
+        then translate(format-date($dateTime, '[Z]'), ':', '')
+        else '+0000'
     return (
         $day.string ||', '|| $day || ' ' || $month || ' ' || $year || ' ' || $time || ' ' || $timezone
     )
