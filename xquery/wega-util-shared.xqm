@@ -34,6 +34,8 @@ declare function wega-util-shared:has-content($items as item()*) as xs:boolean {
     case attribute() return ( if(normalize-space($item) castable as xs:double) then wega-util-shared:has-content(xs:double(normalize-space($item))) else wega-util-shared:has-content(string($item)) )
     case element() return ( if(normalize-space($item) castable as xs:double) then wega-util-shared:has-content(xs:double(normalize-space($item))) else wega-util-shared:has-content(string($item)) )
     case xs:string return normalize-space($item) != ''
+    case xs:date return true() 
+    case xs:dateTime return true()
     case function(*) return true()
     default return boolean($item)
 };
