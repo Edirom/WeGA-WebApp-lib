@@ -117,7 +117,7 @@ declare function date:format-date($date as xs:date, $picture as xs:string, $lang
 declare function date:printDate($date as element()?, $lang as xs:string, $get-language-string as function(xs:string, xs:string*) as xs:string, $get-picture-string as function(xs:string) as xs:string) as xs:string? {
     if($date) then (
         let $picture-string := $get-picture-string($lang) (: if($lang = 'de') then '[D1o] [MNn] [Y]' else '[MNn] [D], [Y]':)
-        let $picture-string-day := replace($picture-string, '.*(\[D[^\]]*\]).*', '$1') (: extract only the day specifier from the picture string :)
+        let $picture-string-day := replace($picture-string, '.*(\[D[^\]]*\][^ ]).*', '$1') (: extract only the day specifier from the picture string :)
         let $notBefore  := if($date/@notBefore) then date:getCastableDate(data($date/@notBefore),false())
                            else if($date/@notBefore-iso) then date:getCastableDate(data($date/@notBefore-iso),false())
                            else()
