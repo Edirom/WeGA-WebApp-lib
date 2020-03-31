@@ -136,7 +136,12 @@ declare %test:assertFalse function wust:test-has-content-empty-element() as xs:b
 declare %test:assertTrue function wust:test-has-content-element() as xs:boolean {
     wega-util-shared:has-content(<a>foo</a>) and
     wega-util-shared:has-content(<a> foo bar </a>) and
-    wega-util-shared:has-content(<a> 0 0 </a>)
+    wega-util-shared:has-content(<a> 0 0 </a>) and
+    wega-util-shared:has-content(<a><b>foo</b></a>)
 };
 
-
+declare %test:assertTrue function wust:test-has-content-date() as xs:boolean {
+    wega-util-shared:has-content(xs:date('1969-06-07')) and
+    wega-util-shared:has-content(current-date()) and
+    wega-util-shared:has-content(current-dateTime())
+};
