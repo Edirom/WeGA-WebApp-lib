@@ -113,11 +113,14 @@ declare function date:format-date($date as xs:date, $picture as xs:string, $lang
  : @param $lang the current language (en|de)
  : @param $get-language-string a callback function that is expected to return a localized string for a given term. Passed arguments are $term as xs:string, $replacements as xs:string*, and $lang as xs:string 
  : @param $get-picture-string a callback function that is expected to return a picture string for a given language
+ : @param $get-language-string a callback function that is expected to return a localized string for a given term. Passed arguments are $term as xs:string and $lang as xs:string 
+ : @param $get-picture-string a callback function that is expected to return a picture string for a given language. Passed arguments are $lang and $picure-form
+ : @param $picture-form the form of the picture-string to be returned by $get-picture-string, e.g. 'short' or 'long'
  : @return text
  :)
-declare function date:printDate($date as element()?, $lang as xs:string, $get-language-string as function(xs:string, xs:string*, xs:string) as xs:string, $get-picture-string as function(xs:string) as xs:string) as xs:string? {
+declare function date:printDate($date as element()?, $lang as xs:string, $get-language-string as function(xs:string, xs:string*) as xs:string, $get-picture-string as function(xs:string, xs:string) as xs:string, $picture-form as xs:string?) as xs:string? {
     if($date) then (
-        let $picture-string := $get-picture-string($lang) (: if($lang = 'de') then '[D1o] [MNn] [Y]' else '[MNn] [D], [Y]':)
+        let $picture-string := $get-picture-string($lang, $picture-form) (: if($lang = 'de') then '[D1o] [MNn] [Y]' else '[MNn] [D], [Y]':)
         let $picture-string-day := replace($picture-string, '.*(\[D[^\]]*\]).*', '$1') (: extract only the day specifier from the picture string :)
         let $notBefore  := if($date/@notBefore) then date:getCastableDate(data($date/@notBefore),false())
                            else if($date/@notBefore-iso) then date:getCastableDate(data($date/@notBefore-iso),false())
