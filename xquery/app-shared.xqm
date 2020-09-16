@@ -28,7 +28,7 @@ declare variable $app-shared:templates-process :=
  : @author Peter Stadler
  :)
 declare function app-shared:set-attr($node as node(), $model as map(*), $attr as xs:string, $key as xs:string) as element() {
-    element {name($node)} {
+    element {node-name($node)} {
         $node/@*[not(name(.) = $attr)],
         attribute {$attr} {$model($key)},
         $app-shared:templates-process($node/node(), $model)
