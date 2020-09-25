@@ -114,6 +114,27 @@ declare
         date:printDate($dateElement, $lang, dt:translate#3, function($lang) {$picture-string})
 };
 
+declare
+    %test:args("1482-10-15")        %test:assertEmpty
+    %test:args("1582-10-15")        %test:assertEquals("1582-10-05")
+    %test:args("1817-03-04")        %test:assertEquals("1817-02-20")
+    %test:args("1700-03-01")        %test:assertEquals("1700-02-19")
+    %test:args("1696-02-29")        %test:assertEquals("1696-02-19")
+    %test:args("1696-03-01")        %test:assertEquals("1696-02-20")
+    %test:args("1617-02-28")        %test:assertEquals("1617-02-18")
+    %test:args("1616-02-29")        %test:assertEquals("1616-02-19")
+    %test:args("1621-01-08")        %test:assertEquals("1620-12-29")
+    %test:args("1900-01-10")        %test:assertEquals("1899-12-29")
+    %test:args("1900-03-01")        %test:assertEquals("1900-02-17")
+    %test:args("1900-03-13")        %test:assertEquals("1900-02-29")
+    %test:args("1900-03-14")        %test:assertEquals("1900-03-01")
+    %test:args("1700-03-01")        %test:assertEquals("1700-02-19")
+    %test:args("1700-03-11")        %test:assertEquals("1700-02-29")
+    %test:args("1700-03-12")        %test:assertEquals("1700-03-01")
+    function dt:test-gregorian2julian($date as xs:date) as xs:string? {
+        date:gregorian2julian($date)
+};
+
 declare %private function dt:translate($term as xs:string, $replacements as xs:string*, $lang as xs:string) {
     let $localized-string :=
         switch($term)
