@@ -11,7 +11,7 @@ env:
 before_install:
   - docker pull ${DOCKER_IMAGE}
   - ant xar
-  - curl http://exist-db.org/exist/apps/public-repo/public/functx-1.0.xar -o build/functx-1.0.xar
+  - curl http://exist-db.org/exist/apps/public-repo/public/functx-1.0.1.xar -o build/functx-1.0.1.xar
   - docker create --name exist ${DOCKER_IMAGE}
   - for i in build/*.xar ; do docker cp $i exist:/opt/exist/autodeploy/ ; done
   - docker start exist
