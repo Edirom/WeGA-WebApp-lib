@@ -230,23 +230,39 @@ declare function date:printDate($date as element()?, $lang as xs:string, $get-la
 };
 
 (:~
- :  Helper function for translating a Gregorian date to the Julian calendar
- :  see https://de.wikipedia.org/wiki/Umrechnung_zwischen_julianischem_und_gregorianischem_Kalender
+ :  Translate a Gregorian date to the Julian calendar
+ :  NB: since the Julian calendar features leap years which are not present in the Gregorian calendar
+ :  the returned datatype cannot be xs:date which is assumed to be a "valid representation of an XML Gregorian Calendar value".
+ :  Hence the return type is xs:string in the format 'YYYY-MM-DD'
+ :  see https://de.wikipedia.org/wiki/Umrechnung_zwischen_julianischem_und_gregorianischem_Kalender.
+ :  The earliest supported Gregorian date is 1582-10-15, dates before will result in an empty sequence. 
+ :
+ :  @param $date the input date according to the Gregorian calendar  
+ :  @return the converted date according to the Julian calendar
 ~:)
-declare function date:gregorian2julian($date as xs:date) as xs:date? {
-    let $JH :=
-        if(month-from-date($date) lt 3) then ((year-from-date($date) -1) div 100) cast as xs:positiveInteger
-        else (year-from-date($date) div 100) cast as xs:positiveInteger
-    let $diff := 3*(($JH div 4) cast as xs:positiveInteger) + ($JH mod 4) -2
-    return
-        $date - xs:dayTimeDuration('P' || $diff || 'D')
+declare function date:gregorian2julian($date as xs:date) as xs:string? {
+    if($date < xs:date('1582-10-15')) then ()
+    else (
+        let $JH :=
+            if(month-from-date($date) lt 3) then floor((year-from-date($date) -1) div 100)
+            else floor(year-from-date($date) div 100)
+        let $diff := 3*(floor($JH div 4)) + ($JH mod 4) -2
+        (: The Julian calendar has additional leap years, e.g. 1700, 1800, 1900 :)
+        let $julianLeapYear := (year-from-date($date) mod 100 = 0) and not(year-from-date($date) mod 400 = 0)
+        let $julianDate := $date - xs:dayTimeDuration('P' || $diff || 'D')
+        return
+            (: when going from March to February in a Julian leap year we need to add an extra day :)
+            if($julianLeapYear and month-from-date($date) = 3 and month-from-date($julianDate) = 2)
+            then substring($julianDate, 1, 8) || string(day-from-date($julianDate) + 1)
+            else string($julianDate)
+    )
 };
 
 (:~
  : Helper function returning RFC 822 compliant date
  : 
  : @author Benjamin W. Bohl, Bernd Alois Zimmermann-Gesamtausgabe
- : @dateTime input xs:dateTime
+ : @param $dateTime input xs:dateTime
  : @return the constructed RFC 822 date-time as string
 ~:)
 declare function date:rfc822($dateTime as xs:dateTime) as xs:string {
