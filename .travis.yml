@@ -7,7 +7,7 @@ env:
   matrix:
     - DOCKER_IMAGE=stadlerpeter/existdb
     - DOCKER_IMAGE=stadlerpeter/existdb:3.3.0
-    - DOCKER_IMAGE=existdb/existdb:5
+    - DOCKER_IMAGE=existdb/existdb
 
 before_install:
   - docker pull ${DOCKER_IMAGE}
