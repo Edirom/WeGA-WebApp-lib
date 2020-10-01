@@ -17,3 +17,13 @@ declare
     function st:test-print-forename-surname($name as xs:string) as xs:string {
         str:print-forename-surname($name)
 };
+
+declare 
+    %test:args("Ordoñez, Carlos d'")        %test:assertEquals("Ordonez, Carlos d'")
+    %test:args("Heinrich L’Estocq")         %test:assertEquals("Heinrich L’Estocq")
+    %test:args("Abū al-Ḥasan Khān")         %test:assertEquals("Abu al-Hasan Khan")
+    %test:args("Štěpánek, Jan Nepomuk")     %test:assertEquals("Stepanek, Jan Nepomuk")
+    %test:arg("str", "Méhul", "Müller")      %test:assertEquals("Mehul", "Muller")
+    function st:test-strip-diacritics($str as xs:string*) as xs:string* {
+        str:strip-diacritics($str)
+};

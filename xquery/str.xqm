@@ -192,3 +192,15 @@ declare function str:list($items as xs:string*, $lang as xs:string, $maxLength a
         if($count le 2) then string-join($items, ', ')
         else string-join(subsequence($items, 1, $count -1), ', ') || ' ' || $get-language('and', $lang) || ' ' || $items[$count]
 };
+
+(:~
+ : create a flattened version of strings without diacritics, e.g. "Méhul" --> "Mehul"
+ : see http://exist.2174344.n4.nabble.com/stripping-diacritics-with-fn-normalize-unicode-tp4657960.html
+ :
+ : @param $str the input strings to flatten
+ : @return the flattened strings
+~:)
+declare function str:strip-diacritics($str as xs:string*) as xs:string* {
+    for $i in $str
+    return replace(normalize-unicode($i, 'NFKD'),  '[\p{M}]', '')
+};
