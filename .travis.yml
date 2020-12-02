@@ -19,7 +19,7 @@ before_install:
   - for i in build/*.xar ; do docker cp $i exist:${EXIST_AUTODEPLOY}/ ; done
   - docker start exist
   - i=0 ; while (! docker inspect exist | grep -e Status....healthy) ; do if ((i > 30)) ; then echo ' **** timeout ... aborting **** ' ; exit 1 ; else sleep 5 ; echo waiting for container ... ; i=$((i+1)) ; fi ; done
-  - curl -LsS "http://127.0.0.1:8080/exist/apps/WeGA-WebApp-lib/testing/run-tests.xql" -o report.xml
+  - curl -LsS http://localhost:8080/exist/apps/WeGA-WebApp-lib/testing/run-tests.xql -o report.xml
 
 script: 
   - grep testsuite report.xml && (! grep 'failures="[1-9]' report.xml) && (! grep 'errors="[1-9]' report.xml) 
