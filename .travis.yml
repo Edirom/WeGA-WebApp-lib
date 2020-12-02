@@ -15,7 +15,7 @@ before_install:
   - docker pull ${DOCKER_IMAGE}
   - ant xar
   - curl http://exist-db.org/exist/apps/public-repo/public/functx-1.0.1.xar -o build/functx-1.0.1.xar
-  - docker create --name exist ${DOCKER_IMAGE}
+  - docker create --name exist -p 8080:8080 ${DOCKER_IMAGE}
   - for i in build/*.xar ; do docker cp $i exist:${EXIST_AUTODEPLOY}/ ; done
   - docker start exist
   - i=0 ; while (! docker inspect exist | grep -e Status....healthy) ; do if ((i > 30)) ; then echo ' **** timeout ... aborting **** ' ; exit 1 ; else sleep 5 ; echo waiting for container ... ; i=$((i+1)) ; fi ; done
