@@ -5,6 +5,8 @@ xquery version "3.1" encoding "UTF-8";
  :)
 module namespace wega-util-shared="http://xquery.weber-gesamtausgabe.de/modules/wega-util-shared";
 
+declare namespace map="http://www.w3.org/2005/xpath-functions/map";
+
 (:~
  :  A slight modification of the standard XPath function fn:doc-available()
  :  which will return false() for binary documents instead of failing
