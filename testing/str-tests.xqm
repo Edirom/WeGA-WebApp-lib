@@ -27,3 +27,15 @@ declare
     function st:test-strip-diacritics($str as xs:string*) as xs:string* {
         str:strip-diacritics($str)
 };
+
+declare 
+    %test:args("Frankfurt/Main")            %test:assertEquals("Frankfurt\/Main")
+    %test:args("(Frankfurt (Main)")         %test:assertEquals("\(Frankfurt \(Main\)")
+    %test:args("(Frankfurt am Main")        %test:assertEquals("\(Frankfurt am Main")
+    %test:args("Kan[n] das{]]")             %test:assertEquals("Kan\[n\] das\{\]\]")
+    %test:args("?wo? was??")                %test:assertEquals("\?wo\? was\?\?")
+    %test:args("Madrid|Mailand")            %test:assertEquals("Madrid\|Mailand")
+    %test:args("|")                         %test:assertEquals("\|")
+    function st:test-escape-lucene-special-characters($str as xs:string) as xs:string {
+        str:escape-lucene-special-characters($str)
+};

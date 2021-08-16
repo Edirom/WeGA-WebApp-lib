@@ -186,6 +186,30 @@ declare function str:sanitize($str as xs:string) as xs:string {
    else :)$str
 };
 
+(:~
+ : Escape special characters in lucene query strings
+ : See http://lucene.apache.org/core/4_0_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Escaping_Special_Characters
+ : NB: only the characters "/|?{}()[]" are currently being replaced
+ :
+ : @param $str the input string in which to replace Lucene special characters
+ : @return string with replaced characters 
+ :)
+declare function str:escape-lucene-special-characters($str as xs:string) as xs:string {
+    (: found no better way to catch initial escape characters (e.g. '{Hamburg') 
+        but to prefix the string with a dummy character "_" and remove this character afterwards :) 
+    if(matches('_' || $str, '[^\\]/')) then replace('_' || $str, '([^\\])/', '$1\\/') => substring(2) => str:escape-lucene-special-characters()
+    else if(matches('_' || $str, '[^\\]\|')) then replace('_' || $str, '([^\\])\|', '$1\\|') => substring(2) => str:escape-lucene-special-characters()
+    else if(matches('_' || $str, '[^\\]\[')) then replace('_' || $str, '([^\\])\[', '$1\\[') => substring(2) => str:escape-lucene-special-characters()
+    else if(matches('_' || $str, '[^\\]\]')) then replace('_' || $str, '([^\\])\]', '$1\\]') => substring(2) => str:escape-lucene-special-characters()
+    else if(matches('_' || $str, '[^\\]\{')) then replace('_' || $str, '([^\\])\{', '$1\\{') => substring(2) => str:escape-lucene-special-characters()
+    else if(matches('_' || $str, '[^\\]\}')) then replace('_' || $str, '([^\\])\}', '$1\\}') => substring(2) => str:escape-lucene-special-characters()
+    else if(matches('_' || $str, '[^\\]\(')) then replace('_' || $str, '([^\\])\(', '$1\\(') => substring(2) => str:escape-lucene-special-characters()
+    else if(matches('_' || $str, '[^\\]\)')) then replace('_' || $str, '([^\\])\)', '$1\\)') => substring(2) => str:escape-lucene-special-characters()
+    else if(matches('_' || $str, '[^\\]\?')) then replace('_' || $str, '([^\\])\?', '$1\\?') => substring(2) => str:escape-lucene-special-characters()
+    else $str
+};
+
+
 declare function str:list($items as xs:string*, $lang as xs:string, $maxLength as xs:int, $get-language as function() as xs:string) as xs:string? {
     let $count := count($items)
     return
