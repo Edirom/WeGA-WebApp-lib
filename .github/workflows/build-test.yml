@@ -15,5 +15,30 @@ jobs:
       - name: Archive xar package
         uses: actions/upload-artifact@v2
         with:
-          name: xar package
+          name: xar-package
           path: build/*.xar
+  test:
+    needs: build
+    name: Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Download xar package
+        uses: actions/download-artifact@v2
+        with:
+          name: xar-package
+          path: xars
+      - name: Download functx package
+        run: curl http://exist-db.org/exist/apps/public-repo/public/functx-1.0.1.xar -o xars/functx-1.0.1.xar
+      - name: Create Docker container
+        run: |
+          docker create --name exist -p 8080:8080 existdb/existdb:5.2.0
+          for i in xars/*.xar ; do docker cp $i exist:${EXIST_AUTODEPLOY}/ ; done
+      - name: Run Docker container
+        run: |
+          docker start exist
+          i=0 ; while (! docker inspect exist | grep -e Status....healthy) ; do if ((i > 30)) ; then echo ' **** timeout ... aborting **** ' ; exit 1 ; else sleep 5 ; echo waiting for container ... ; i=$((i+1)) ; fi ; done
+      - name: Run test suite
+        run: |
+          curl -LsS http://localhost:8080/exist/apps/WeGA-WebApp-lib/testing/run-tests.xql -o report.xml
+          grep testsuite report.xml && (! grep 'failures="[1-9]' report.xml) && (! grep 'errors="[1-9]' report.xml)
