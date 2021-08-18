@@ -21,6 +21,16 @@ jobs:
     needs: build
     name: Test
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - DOCKER_IMAGE: stadlerpeter/existdb
+            EXIST_AUTODEPLOY: /opt/exist/autodeploy
+          - DOCKER_IMAGE: stadlerpeter/existdb:3.3.0 
+            EXIST_AUTODEPLOY: /opt/exist/autodeploy
+          - DOCKER_IMAGE: existdb/existdb:5.3.0 
+            EXIST_AUTODEPLOY: /exist/autodeploy
     
     steps:
       - name: Download xar package
@@ -32,14 +42,14 @@ jobs:
         run: curl http://exist-db.org/exist/apps/public-repo/public/functx-1.0.1.xar -o xars/functx-1.0.1.xar
       - name: Create Docker container
         run: |
-          docker create --name exist -p 8080:8080 existdb/existdb:5.2.0
-          for i in xars/*.xar ; do docker cp $i exist:${EXIST_AUTODEPLOY}/ ; done
+          docker create --name exist -p 8080:8080 ${{ matrix.DOCKER_IMAGE }}
+          for i in xars/*.xar ; do docker cp $i exist:${{ matrix.EXIST_AUTODEPLOY }}/ ; done
       - name: Run Docker container
         run: |
           docker start exist
           i=0 ; while (! docker inspect exist | grep -e Status....healthy) ; do if ((i > 30)) ; then echo ' **** timeout ... aborting **** ' ; exit 1 ; else sleep 5 ; echo waiting for container ... ; i=$((i+1)) ; fi ; done
       - name: Run test suite
-        run: |
-          curl -LsS http://localhost:8080/exist/apps/WeGA-WebApp-lib/testing/run-tests.xql -o report.xml
-          grep testsuite report.xml && (! grep 'failures="[1-9]' report.xml) && (! grep 'errors="[1-9]' report.xml)
+        run: curl -LsS http://localhost:8080/exist/apps/WeGA-WebApp-lib/testing/run-tests.xql -o report.xml
+      - name: Parse test results
+        run: grep testsuite report.xml && (! grep 'failures="[1-9]' report.xml) && (! grep 'errors="[1-9]' report.xml)
         shell: bash {0}
