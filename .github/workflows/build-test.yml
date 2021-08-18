@@ -1,0 +1,19 @@
+name: Building and Testing
+
+on: push
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build xar package
+        run: ant clean xar
+      - name: Archive xar package
+        uses: actions/upload-artifact@v2
+        with:
+          name: xar package
+          path: build/*.xar
