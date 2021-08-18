@@ -53,3 +53,6 @@ jobs:
       - name: Parse test results
         run: grep testsuite report.xml && (! grep 'failures="[1-9]' report.xml) && (! grep 'errors="[1-9]' report.xml)
         shell: bash {0}
+      - name: Error output
+        if: ${{ failure() }}
+        run: cat report.xml
