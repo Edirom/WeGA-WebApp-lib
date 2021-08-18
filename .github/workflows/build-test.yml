@@ -42,3 +42,4 @@ jobs:
         run: |
           curl -LsS http://localhost:8080/exist/apps/WeGA-WebApp-lib/testing/run-tests.xql -o report.xml
           grep testsuite report.xml && (! grep 'failures="[1-9]' report.xml) && (! grep 'errors="[1-9]' report.xml)
+        shell: bash {0}
