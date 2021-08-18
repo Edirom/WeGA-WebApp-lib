@@ -38,8 +38,10 @@ jobs:
         with:
           name: xar-package
           path: xars
-      - name: Download functx package
-        run: curl http://exist-db.org/exist/apps/public-repo/public/functx-1.0.1.xar -o xars/functx-1.0.1.xar
+      - name: Download additional xar packages
+        run: |
+          curl -LsS http://exist-db.org/exist/apps/public-repo/public/functx-1.0.1.xar -o xars/functx-1.0.1.xar
+          curl -LsS http://exist-db.org/exist/apps/public-repo/public/shared-resources-0.9.1.xar -o xars/shared-resources-0.9.1.xar
       - name: Create Docker container
         run: |
           docker create --name exist -p 8080:8080 ${{ matrix.DOCKER_IMAGE }}
