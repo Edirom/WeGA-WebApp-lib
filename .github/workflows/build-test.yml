@@ -27,9 +27,7 @@ jobs:
         include:
           - DOCKER_IMAGE: stadlerpeter/existdb
             EXIST_AUTODEPLOY: /opt/exist/autodeploy
-          - DOCKER_IMAGE: stadlerpeter/existdb:3.3.0 
-            EXIST_AUTODEPLOY: /opt/exist/autodeploy
-          - DOCKER_IMAGE: existdb/existdb:5.3.0 
+          - DOCKER_IMAGE: existdb/existdb:5.3.1
             EXIST_AUTODEPLOY: /exist/autodeploy
     
     steps:
@@ -41,7 +39,7 @@ jobs:
       - name: Download additional xar packages
         run: |
           curl -LsS http://exist-db.org/exist/apps/public-repo/public/functx-1.0.1.xar -o xars/functx-1.0.1.xar
-          curl -LsS http://exist-db.org/exist/apps/public-repo/public/shared-resources-0.9.1.xar -o xars/shared-resources-0.9.1.xar
+          curl -LsS http://exist-db.org/exist/apps/public-repo/public/templating-1.0.2.xar -o xars/templating-1.0.2.xar
       - name: Create Docker container
         run: |
           docker create --name exist -p 8080:8080 ${{ matrix.DOCKER_IMAGE }}
