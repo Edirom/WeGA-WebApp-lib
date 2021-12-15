@@ -4,7 +4,7 @@ xquery version "3.1" encoding "UTF-8";
  : XQuery functions supplementing the eXist-db templating module
  :)
 module namespace app-shared="http://xquery.weber-gesamtausgabe.de/modules/app-shared";
-declare namespace templates="http://exist-db.org/xquery/templates";
+declare namespace templates="http://exist-db.org/xquery/html-templating";
 declare namespace output="http://www.w3.org/2010/xslt-xquery-serialization";
 declare namespace map="http://www.w3.org/2005/xpath-functions/map";
 
