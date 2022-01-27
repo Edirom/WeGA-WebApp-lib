@@ -25,9 +25,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - DOCKER_IMAGE: stadlerpeter/existdb
+          - DOCKER_IMAGE: stadlerpeter/existdb:5.4
             EXIST_AUTODEPLOY: /opt/exist/autodeploy
-          - DOCKER_IMAGE: existdb/existdb:5.3.1
+          - DOCKER_IMAGE: existdb/existdb:6.0.0
             EXIST_AUTODEPLOY: /exist/autodeploy
           - DOCKER_IMAGE: existdb/existdb:5.2.0
             EXIST_AUTODEPLOY: /exist/autodeploy
