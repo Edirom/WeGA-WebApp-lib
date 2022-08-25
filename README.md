@@ -11,7 +11,8 @@ This is a library package—originally for the [WeGA-WebApp](https://github.com/
 Prerequisites
 -------------
 
-A recent [eXist-db](http://exist-db.org/) with support for XQuery 3.1
+A recent [eXist-db](http://exist-db.org/), v5.2.0 or newer
+
 
 How to use
 ----------
