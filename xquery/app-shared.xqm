@@ -8,7 +8,6 @@ declare namespace templates="http://exist-db.org/xquery/html-templating";
 declare namespace output="http://www.w3.org/2010/xslt-xquery-serialization";
 declare namespace map="http://www.w3.org/2005/xpath-functions/map";
 
-import module namespace functx="http://www.functx.com";
 import module namespace str="http://xquery.weber-gesamtausgabe.de/modules/str" at "str.xqm";
 import module namespace wega-util-shared="http://xquery.weber-gesamtausgabe.de/modules/wega-util-shared" at "wega-util-shared.xqm";
 
