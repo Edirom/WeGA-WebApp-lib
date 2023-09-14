@@ -6,7 +6,11 @@ xquery version "3.1" encoding "UTF-8";
 module namespace my-cache="http://xquery.weber-gesamtausgabe.de/modules/cache";
 
 declare namespace output="http://www.w3.org/2010/xslt-xquery-serialization";
+
+import module namespace xmldb="http://exist-db.org/xquery/xmldb";
+import module namespace util="http://exist-db.org/xquery/util";
 import module namespace functx="http://www.functx.com";
+
 import module namespace wega-util-shared="http://xquery.weber-gesamtausgabe.de/modules/wega-util-shared" at "wega-util-shared.xqm";
 import module namespace cm="http://exist-db.org/xquery/cache" at "java:org.exist.xquery.modules.cache.CacheModule";
 
