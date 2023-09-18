@@ -11,6 +11,7 @@ declare
     %test:args("jpg")   %test:assertEquals("image/jpeg")
     %test:args("html")  %test:assertEquals("text/html")
     %test:args("txt")   %test:assertEquals("text/plain")
+    %test:args("gz")    %test:assertEquals("application/gzip")
     function wust:test-guess-mimeType-from-suffix($suffix as xs:string) as xs:string? {
         wega-util-shared:guess-mimeType-from-suffix($suffix)
 };
