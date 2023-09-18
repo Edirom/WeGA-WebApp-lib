@@ -41,7 +41,7 @@ declare function local:mkcol($collection, $path) {
 local:mkcol("/db/system/config", $target),
 
 (: store index configuration :)
-xdb:store(concat("/db/system/config/", $target), 'collection.xconf', xs:anyURI(concat('file://', $dir, '/collection.xconf')), 'application/xml'),
+xdb:store-files-from-pattern(concat("/system/config", $target), $dir, "**/*.xconf", (), true()),
 
 (: reindex our new collection :)
 xdb:reindex($target)
