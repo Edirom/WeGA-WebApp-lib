@@ -9,11 +9,11 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Build xar package
         run: ant clean xar
       - name: Archive xar package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: xar-package
           path: build/*.xar
@@ -34,7 +34,7 @@ jobs:
     
     steps:
       - name: Download xar package
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: xar-package
           path: xars
