@@ -161,7 +161,7 @@ declare function geo:is-valid-polygon($polygon as map(*)) as xs:boolean {
  : @param $geojson The GeoJSON data to validate.
  : @return xs:boolean True if the GeoJSON data is valid, false otherwise.
  :)
-declare function local:is-valid-geojson($geojson as map(*)) as xs:boolean {
+declare function geo:is-valid-geojson($geojson as map(*)) as xs:boolean {
   ($geojson?type = "Point" and geo:is-valid-point($geojson)) or
   ($geojson?type = "Polygon" and geo:is-valid-polygon($geojson))
 };
