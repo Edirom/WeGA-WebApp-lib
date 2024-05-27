@@ -147,7 +147,10 @@ declare function str:txtFromTEI($nodes as node()*, $lang as xs:string) as xs:str
         	if($node/@cert) then ($node/child::node() ! str:txtFromTEI(., $lang), '(?)') 
         	else $node/child::node() ! str:txtFromTEI(., $lang)
         case element(tei:del) return ()
+        case element(tei:orig) return ()
+        case element(tei:sic) return if($node/parent::tei:choice) then() else($node)
         case element(tei:subst) return $node/child::element() ! str:txtFromTEI(., $lang)
+        case element(tei:choice) return $node/child::element() ! str:txtFromTEI(., $lang)
         case element(tei:app) return ($node/tei:lem, $node/tei:rdg)[1] ! str:txtFromTEI(., $lang)
         case element(tei:note) return ()
         case element(tei:lb) return 
