@@ -53,8 +53,8 @@ declare
     %test:assertEquals("testing choice with ", "corr", " in text.")
     %test:args('<p xmlns="http://www.tei-c.org/ns/1.0">te escribo en <choice><sic>Ingles</sic><corr>Inglés</corr></choice> <choice><sic>por que</sic><corr>porque</corr></choice> mi <choice><sic>Español</sic><corr>español</corr></choice> está demasiado limitado como vocabulario,</p>','de')
     %test:assertEquals("te escribo en ", "Inglés", " ", "porque", " mi ", "español", " está demasiado limitado como vocabulario,")
-    %test:args('<p xmlns="http://www.tei-c.org/ns/1.0">Dieser Text enthält ein <sic>einzlenes</sic> sic.</p>','de')
-    %test:assertEquals("Dieser Text enthält ein ", "einzlenes", " sic.")
+    %test:args('<p xmlns="http://www.tei-c.org/ns/1.0">Dieser Text enthält ein <sic>einzelnes</sic> sic.</p>','de')
+    %test:assertEquals("Dieser Text enthält ein ", "einzelnes", " sic.")
     function st:test-txtFromTEI($elem as element(), $lang as xs:string) as xs:string* {
         str:txtFromTEI($elem, $lang)
 };
