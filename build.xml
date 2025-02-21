@@ -32,9 +32,10 @@
                 <include name="**"/>
                 <!-- with some exceptions … -->
                 <exclude name="build.xml"/>
-                <exclude name=".travis.yml"/>
                 <exclude name="build/**"/>
                 <exclude name="dist/**"/>
+                <exclude name=".idea/**"/>
+                <exclude name=".github/**"/>
                 <exclude name="*build.properties"/>
                 <exclude name=".git*"/>
                 <exclude name="*.tmpl"/>
