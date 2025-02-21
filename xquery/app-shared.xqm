@@ -23,8 +23,6 @@ declare variable $app-shared:templates-process :=
 
 (:~
  : Set an attribute to the value given in the $model map
- :
- : @author Peter Stadler
  :)
 declare function app-shared:set-attr($node as node(), $model as map(*), $attr as xs:string, $key as xs:string) as element() {
     element {node-name($node)} {
@@ -37,7 +35,10 @@ declare function app-shared:set-attr($node as node(), $model as map(*), $attr as
 (:~
  : Simply print the string value of $model($key)
  :
- : @author Peter Stadler
+ : @param $node the current node to process from the HTML template
+ : @parma $model the current model that's passed on by the templating module
+ : @param $key the key to look for in the current $model
+ : @return the string value of $model($key)
  :)
 declare 
     %templates:wrap
@@ -49,21 +50,25 @@ declare
 (:~
  : Simply print a sequence from the $model map by joining items with $separator
  :
+ : @param $node the current node to process from the HTML template
+ : @parma $model the current model that's passed on by the templating module
+ : @param $key the key to look for in the current $model
+ : @param $max the maximum number of items from $model($key) to process
  : @param $separator the separator for the string-join()
- : @author Peter Stadler
  :)
 declare 
     %templates:wrap
     %templates:default("max", "0")
     %templates:default("separator", ", ")
     function app-shared:join($node as node(), $model as map(*), $key as xs:string, $max as xs:string, $separator as xs:string) as xs:string? {
+        let $itemsSeq := $model($key) => app-shared:array2seq()
         let $items := 
-            if($max castable as xs:integer and number($max) le 0) then $model($key)
-            else if($max castable as xs:integer and number($max) < count($model($key))) then (subsequence($model($key), 1, $max), '…')
-            else if($max castable as xs:integer and number($max) > 0) then subsequence($model($key), 1, $max)
-            else $model($key)
+            if($max castable as xs:integer and number($max) le 0) then $itemsSeq
+            else if($max castable as xs:integer and number($max) < count($itemsSeq)) then (subsequence($itemsSeq, 1, $max), '…')
+            else if($max castable as xs:integer and number($max) > 0) then subsequence($itemsSeq, 1, $max)
+            else $itemsSeq
         return
-            if (every $i in $items satisfies $i castable as xs:string) then string-join($items ! str:normalize-space(.), $separator)
+            if ((count($items) gt 0) and (every $i in $items satisfies $i castable as xs:string)) then string-join($items ! str:normalize-space(.), $separator)
             else ()
 };
 
@@ -72,9 +77,13 @@ declare
  : A non-wrapping alternative to the standard templates:each()
  : Gets rid of the superfluous first list item
  : 
+ : @param $node the current node to process from the HTML template
+ : @parma $model the current model that's passed on by the templating module
+ : @param $from references a property in the model map which should be used as the source sequence to iterate 
+ : @prama $to the name of the property to be added to the model map. This will contain the current iteration item
+ : @param $max the maximum number of items from $model($from) to process
  : @param $callback a callback function that will take two parameters ($node as node(), $model as map(*)) 
  : @param $callbackNamespace the namespace of the callback function
- : @author Peter Stadler
  :)
 declare 
     %templates:default("max", "0")
@@ -82,8 +91,8 @@ declare
     %templates:default("callbackNamespace", "")
     function app-shared:each($node as node(), $model as map(*), $from as xs:string, $to as xs:string, $max as xs:string, $callback as xs:string, $callbackNamespace as xs:string) as node()* {
     let $items := 
-        if($max castable as xs:integer and $max != '0') then subsequence($model($from), 1, $max)
-        else $model($from)
+        if($max castable as xs:integer and $max != '0') then app-shared:array2seq($model($from)) => subsequence(1, $max)
+        else app-shared:array2seq($model($from))
     let $callbackFunc := 
         if($callback ne '0') then 
             try { function-lookup(QName($callbackNamespace, $callback), 2) } 
@@ -175,7 +184,6 @@ declare
  : @param $key the key in $model to look for
  : @param $value the value of $key to match
  : @param $wrap whether to copy the node $node to the output or just process the child nodes of $node  
- : @author Peter Stadler
  :)
 declare 
     %templates:default("wrap", "yes")
@@ -210,7 +218,7 @@ declare function app-shared:order-list-items($node as node(), $model as map(*)) 
  : @param $model a map (a default param from the templating module)
  : @param $key the key in $model to look for
  : @param $wrap whether to copy the node $node to the output or to replace it with $model?key (default is "no")
-~:)
+ :)
 declare 
     %templates:default("wrap", "no")
     function app-shared:output($node as node(), $model as map(*), $key as xs:string, $wrap as xs:string) as item()* {
@@ -229,7 +237,7 @@ declare
  : @param $node the processed $node from the html template (a default param from the templating module)
  : @param $content the (new) content
  : @param $wrap whether to copy the node $node to the output or to replace it with $model?key
-~:)
+ :)
 declare %private function app-shared:wrap($node as node(), $content as item()*, $wrap as xs:string) {
     if(wega-util-shared:semantic-boolean($wrap)) then
         element {node-name($node)} {
@@ -237,4 +245,16 @@ declare %private function app-shared:wrap($node as node(), $content as item()*, 
             $content 
         }
     else $content
+};
+
+(:~
+ : Converts arrays to sequences 
+ : Helper function for various functions above
+ :
+ : @param $items arbitrary items
+ :)
+declare %private function app-shared:array2seq($items as item()*) as item()* {
+    if($items instance of array(*)) 
+    then $items?*
+    else $items
 };
