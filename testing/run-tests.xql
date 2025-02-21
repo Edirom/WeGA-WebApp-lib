@@ -8,6 +8,7 @@ import module namespace dt="http://xquery.weber-gesamtausgabe.de/modules/date-te
 import module namespace st="http://xquery.weber-gesamtausgabe.de/modules/str-tests" at "str-tests.xqm";
 import module namespace mt="http://xquery.weber-gesamtausgabe.de/modules/math-tests" at "math-tests.xqm";
 import module namespace geot="http://xquery.weber-gesamtausgabe.de/modules/geo-tests" at "geo-tests.xqm";
+import module namespace ast="http://xquery.weber-gesamtausgabe.de/modules/app-shared-tests" at "app-shared-tests.xqm";
 
 (: the test:suite() function will run all the test-annotated functions in the module whose namespace URI you provide :)
 test:suite((
@@ -15,5 +16,6 @@ test:suite((
     util:list-functions("http://xquery.weber-gesamtausgabe.de/modules/str-tests"),
     util:list-functions("http://xquery.weber-gesamtausgabe.de/modules/wega-util-shared-tests"),
     util:list-functions("http://xquery.weber-gesamtausgabe.de/modules/math-tests"),
-    util:list-functions("http://xquery.weber-gesamtausgabe.de/modules/geo-tests")
+    util:list-functions("http://xquery.weber-gesamtausgabe.de/modules/geo-tests"),
+    util:list-functions("http://xquery.weber-gesamtausgabe.de/modules/app-shared-tests")
 ))
