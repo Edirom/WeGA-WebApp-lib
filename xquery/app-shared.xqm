@@ -63,9 +63,9 @@ declare
     function app-shared:join($node as node(), $model as map(*), $key as xs:string, $max as xs:string, $separator as xs:string) as xs:string? {
         let $itemsSeq := $model($key) => app-shared:array2seq()
         let $items := 
-            if($max castable as xs:integer and number($max) le 0) then $itemsSeq
-            else if($max castable as xs:integer and number($max) < count($itemsSeq)) then (subsequence($itemsSeq, 1, $max), '…')
-            else if($max castable as xs:integer and number($max) > 0) then subsequence($itemsSeq, 1, $max)
+            if($max castable as xs:double and number($max) le 0) then $itemsSeq
+            else if($max castable as xs:double and number($max) lt count($itemsSeq)) then (subsequence($itemsSeq, 1, number($max)), '…')
+            else if($max castable as xs:double and number($max) gt 0) then subsequence($itemsSeq, 1, number($max))
             else $itemsSeq
         return
             if ((count($items) gt 0) and (every $i in $items satisfies $i castable as xs:string)) then string-join($items ! str:normalize-space(.), $separator)
@@ -91,7 +91,7 @@ declare
     %templates:default("callbackNamespace", "")
     function app-shared:each($node as node(), $model as map(*), $from as xs:string, $to as xs:string, $max as xs:string, $callback as xs:string, $callbackNamespace as xs:string) as node()* {
     let $items := 
-        if($max castable as xs:integer and $max != '0') then app-shared:array2seq($model($from)) => subsequence(1, $max)
+        if($max castable as xs:double and number($max) gt 0) then app-shared:array2seq($model($from)) => subsequence(1, number($max))
         else app-shared:array2seq($model($from))
     let $callbackFunc := 
         if($callback ne '0') then 
