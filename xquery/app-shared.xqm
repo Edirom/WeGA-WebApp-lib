@@ -63,9 +63,8 @@ declare
     function app-shared:join($node as node(), $model as map(*), $key as xs:string, $max as xs:string, $separator as xs:string) as xs:string? {
         let $itemsSeq := $model($key) => app-shared:array2seq()
         let $items := 
-            if($max castable as xs:double and number($max) le 0) then $itemsSeq
-            else if($max castable as xs:double and number($max) lt count($itemsSeq)) then (subsequence($itemsSeq, 1, number($max)), '…')
-            else if($max castable as xs:double and number($max) gt 0) then subsequence($itemsSeq, 1, number($max))
+            (: fn:subsequence does seem to round xs:double so we need to take this into account :)
+            if($max castable as xs:double and round(number($max)) lt count($itemsSeq) and round(number($max)) ge 1) then (subsequence($itemsSeq, 1, number($max)), '…')
             else $itemsSeq
         return
             if ((count($items) gt 0) and (every $i in $items satisfies $i castable as xs:string)) then string-join($items ! str:normalize-space(.), $separator)
