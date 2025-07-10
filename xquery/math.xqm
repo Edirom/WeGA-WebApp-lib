@@ -7,7 +7,6 @@ module namespace math="http://xquery.weber-gesamtausgabe.de/modules/math";
 
 declare namespace map="http://www.w3.org/2005/xpath-functions/map";
 declare namespace w3cmath="http://www.w3.org/2005/xpath-functions/math";
-import module namespace functx="http://www.functx.com";
 
 (:~
  : Simple mapping of integer to hex numbers 
@@ -92,7 +91,7 @@ declare function math:int2hex($number as xs:int, $minLength as xs:int) as xs:str
     let $hex.value := math:int2hex($pos.number)
     let $padded.hex.value :=
         if ($minLength le string-length($hex.value)) then $hex.value
-        else (functx:repeat-string('0', $minLength - string-length($hex.value)) || $hex.value)
+        else (math:repeat-string('0', $minLength - string-length($hex.value)) || $hex.value)
     return
         if($pos) then $padded.hex.value
         else '-' || $padded.hex.value (: readd minus sign if necessary :)
@@ -123,4 +122,19 @@ declare function math:hex2int($number as xs:string) as xs:int? {
         if(not(matches($pos.number, '^[0-9A-F]+$'))) then () (: return empty sequence for non-valid hex values :)
         else if($pos) then $sum
         else $sum * -1 (: readd minus sign if necessary :)
+(:~
+ : The function returns a string consisting of a given 
+ : number of copies of $stringToRepeat concatenated together. 
+ : To pad a string to a particular length, use the functx:pad-string-to-length function.
+ :
+ : Function taken from https://www.datypic.com/xq/functx_repeat-string.html
+ :
+ : @param $stringToRepeat the to be repeated string
+ : @param $count number of copies
+ : @return the repeated string
+ :)
+declare function math:repeat-string($stringToRepeat as xs:string?, $count as xs:integer) as xs:string {
+    string-join((for $i in 1 to $count return $stringToRepeat), '')
+};
+
 };
