@@ -59,3 +59,32 @@ declare
     function mt:test-hex2int($i as xs:string) as xs:int? {
         m:hex2int($i)
 };
+
+declare 
+    %test:args("A040200")   %test:assertEquals("C")
+    %test:args("A040201")   %test:assertEquals("F")
+    %test:args("A040219")   %test:assertEquals("C")
+    %test:args("")          %test:assertEquals("0")
+    %test:args("FFffF")     %test:assertEquals("E")
+    %test:args("-1")        %test:assertEquals("E")
+    %test:args("€")         %test:assertEquals("8")
+    %test:args("Ä")         %test:assertEquals("8")
+    %test:args("0")         %test:assertEquals("0")
+    %test:args("<yäölfwüoie09485asülvk")     %test:assertEquals("4")
+    function mt:test-compute-check-digit($id as xs:string) as xs:string {
+        m:compute-check-digit($id)
+};
+
+declare 
+    %test:args("A040200C")  %test:assertTrue
+    %test:args("A040201F")  %test:assertTrue
+    %test:args("A040219C")  %test:assertTrue
+    %test:args("")          %test:assertFalse
+    %test:args("<yäölfwüoie09485asülvk4")   %test:assertTrue
+    %test:args("yäölfwüoie09485asülvk4")    %test:assertFalse
+    %test:args("-1")        %test:assertFalse
+    %test:args("€8")        %test:assertTrue
+    %test:arg("id")         %test:assertFalse
+    function mt:test-validate-check-digit($id as xs:string?) as xs:boolean {
+        m:validate-check-digit($id)
+};
