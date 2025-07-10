@@ -137,4 +137,38 @@ declare function math:repeat-string($stringToRepeat as xs:string?, $count as xs:
     string-join((for $i in 1 to $count return $stringToRepeat), '')
 };
 
+(:~
+ : Compute a check digit for a given ID
+ : The check digit is computed by multiplying the 
+ : codepoint of each character with a multiplier taken 
+ : from a fixed sequence (2, 4, 6, 8, 9, 5, 3, 1)
+ : 
+ : @param $id the id to compute the check digit for
+ : @return the computed check digit as a hexadecimal value 
+ :)
+declare function math:compute-check-digit($id as xs:string) as xs:string {
+    (: Initial sequence of weights :)
+    let $weightsSeq := (2, 4, 6, 8, 9, 5, 3, 1)
+    (: Factor of size difference between the initial sequence of weights and the string-length of the provided ID (aka payload) :)
+    let $factor := (string-length($id) div count($weightsSeq)) => ceiling() => xs:integer()
+    (: extend the sequence of weights by $factor :)
+    let $weightsSeqExtended := for $i in (1 to $factor) return $weightsSeq
+    (: now finally adjust the sequence of weights to the length of the payload :)
+    let $weights := subsequence($weightsSeqExtended, 1, string-length($id))
+    
+    let $codepoints := string-to-codepoints($id)
+    let $weighted-codepoints := for $i at $c in string-to-codepoints($id) return $i * $weights[$c]
+    return math:int2hex(sum($weighted-codepoints) mod 16)
+};
+
+(:~
+ : Validate an ID 
+ : by stripping off the last character/digit and comparing it to 
+ : the computed check digit of `math:compute-check-digit#1`
+ :
+ : @param $id the ID to check
+ : @return true if the comparison is successful, false otherwise 
+ :)
+declare function math:validate-check-digit($id as xs:string?) as xs:boolean {
+    substring($id, string-length($id)) = math:compute-check-digit(substring($id, 1, string-length($id) - 1))
 };
