@@ -49,22 +49,21 @@ declare %private function math:reverse-int2hex-map() as map(*) {
  : @param $number integer value that will be converted to a hex string
  : @return hexadecimal string
  :)
-declare function math:int2hex($number as xs:int) as xs:string {
+declare function math:int2hex($number as xs:integer) as xs:string {
     let $pos := $number ge 0 (: check whether it's a positive number :)
     let $pos.number := (: turn negative numbers into positive :)
-        if($pos) then $number
-        else $number * -1
+        abs($number)
     let $hex.value :=
-        if($pos.number lt 16) then $math:int2hex($pos.number)
+        if($pos.number lt 16) then $math:int2hex(string($pos.number))
         else (
             let $div := $pos.number div 16
             let $count := floor($div)
             let $remainder := ($div - $count) * 16
             return
                 concat(
-                    if($count gt 15) then math:int2hex($count)
-                    else $math:int2hex($count),
-                    $math:int2hex($remainder)
+                    if($count gt 15) then math:int2hex($count => xs:integer())
+                    else $math:int2hex(string($count)),
+                    $math:int2hex(string($remainder))
                 )
         )
     return
@@ -83,12 +82,11 @@ declare function math:int2hex($number as xs:int) as xs:string {
  : @param $minLength integer value of the desired minimum length
  : @return hexadecimal string
  :)
-declare function math:int2hex($number as xs:int, $minLength as xs:int) as xs:string {
+declare function math:int2hex($number as xs:integer, $minLength as xs:integer) as xs:string {
     let $pos := $number ge 0 (: check whether it's a positive number :)
     let $pos.number := (: turn negative numbers into positive :)
-        if($pos) then $number
-        else $number * -1
-    let $hex.value := math:int2hex($pos.number)
+        abs($number)
+    let $hex.value := math:int2hex($pos.number => xs:integer())
     let $padded.hex.value :=
         if ($minLength le string-length($hex.value)) then $hex.value
         else (math:repeat-string('0', $minLength - string-length($hex.value)) || $hex.value)
@@ -105,7 +103,7 @@ declare function math:int2hex($number as xs:int, $minLength as xs:int) as xs:str
  : @param $number hex string that will be converted to an integer
  : @return integer value of the hex string or the empty sequence if conversion fails
  :)
-declare function math:hex2int($number as xs:string) as xs:int? {
+declare function math:hex2int($number as xs:string) as xs:integer? {
     let $hex2int.map := math:reverse-int2hex-map()
     let $pos := not(starts-with(normalize-space($number), '-'))
     let $pos.number := 
@@ -116,12 +114,14 @@ declare function math:hex2int($number as xs:string) as xs:int? {
             for $i in (1 to string-length($pos.number))
             let $pow := string-length($pos.number) - $i
             return
-                xs:int($hex2int.map(substring($pos.number, $i, 1))) * w3cmath:pow(16, $pow)
+                number($hex2int.map(substring($pos.number, $i, 1))) * w3cmath:pow(16, $pow)
         )
     return
         if(not(matches($pos.number, '^[0-9A-F]+$'))) then () (: return empty sequence for non-valid hex values :)
-        else if($pos) then $sum
-        else $sum * -1 (: readd minus sign if necessary :)
+        else if($pos) then $sum => xs:integer()
+        else ($sum * -1) (: readd minus sign if necessary :) => xs:integer()
+};
+
 (:~
  : The function returns a string consisting of a given 
  : number of copies of $stringToRepeat concatenated together. 
