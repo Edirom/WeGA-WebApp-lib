@@ -18,11 +18,11 @@ declare
     %test:args("-32756")    %test:assertEquals("-7FF4")
     %test:args("-35631")    %test:assertEquals("-8B2F")
     %test:args("-1048575")  %test:assertEquals("-FFFFF")
-    function mt:test-int2hex($i as xs:int) as xs:string {
+    function mt:test-int2hex($i as xs:integer) as xs:string {
         m:int2hex($i)
 };
 
-declare 
+declare
     %test:args("1", "5")         %test:assertEquals("00001")
     %test:args("15", "8")        %test:assertEquals("0000000F")
     %test:args("1024", "3")      %test:assertEquals("400")
@@ -35,11 +35,11 @@ declare
     %test:args("-32756", "3")    %test:assertEquals("-7FF4")
     %test:args("-35631", "5")    %test:assertEquals("-08B2F")
     %test:args("-1048575", "8")  %test:assertEquals("-000FFFFF")
-    function mt:test-int2hex-minLength($i as xs:int, $j as xs:int) as xs:string {
+    function mt:test-int2hex-minLength($i as xs:integer, $j as xs:integer) as xs:string {
         m:int2hex($i, $j)
 };
 
-declare 
+declare
     %test:args("1")         %test:assertEquals("1")
     %test:args("F")         %test:assertEquals("15")
     %test:args("0F")        %test:assertEquals("15")
@@ -56,7 +56,7 @@ declare
     %test:args("-8B2F")     %test:assertEquals("-35631")
     %test:args("-0008B2F")  %test:assertEquals("-35631")
     %test:args("-FFFFF")    %test:assertEquals("-1048575")
-    function mt:test-hex2int($i as xs:string) as xs:int? {
+    function mt:test-hex2int($i as xs:string) as xs:integer? {
         m:hex2int($i)
 };
 
