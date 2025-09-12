@@ -43,7 +43,7 @@ declare function app-shared:set-attr($node as node(), $model as map(*), $attr as
 declare 
     %templates:wrap
     function app-shared:print($node as node(), $model as map(*), $key as xs:string) as xs:string? {
-        if ($model($key) castable as xs:string) then str:normalize-space($model($key))
+        if ($model($key) castable as xs:string) then str:normalize-space($model($key) => string())
         else app-shared:join($node, $model, $key, '0', '')
 };
 

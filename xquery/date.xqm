@@ -253,7 +253,7 @@ declare function date:gregorian2julian($date as xs:date) as xs:string? {
         return
             (: when going from March to February in a Julian leap year we need to add an extra day :)
             if($julianLeapYear and month-from-date($date) = 3 and month-from-date($julianDate) = 2)
-            then substring($julianDate, 1, 8) || string(day-from-date($julianDate) + 1)
+            then substring(string($julianDate), 1, 8) || string(day-from-date($julianDate) + 1)
             else string($julianDate)
     )
 };

@@ -495,6 +495,6 @@ declare function wega-util-shared:semantic-boolean($item as item()) as xs:boolea
     let $true-strings := ('yes', '1', 'true')
     return
         if($item castable as xs:string)
-        then normalize-space($item) = $true-strings
+        then normalize-space(string($item)) = $true-strings
         else false()
 };
