@@ -23,10 +23,10 @@ declare function ics:parse-ics($text as xs:string) as element(ical:icalendar)? {
         for $line in subsequence($lines, 2, index-of($lines, "BEGIN:VEVENT")[1] - 2)
         return ics:parse-ics-line($line)
     let $check-sanity :=
-        $lines[. = "BEGIN:VEVENT"] and
-        $lines[. = "END:VEVENT"] and
-        $lines[. = "BEGIN:VCALENDAR"] and
-        $lines[. = "END:VCALENDAR"]
+        count(index-of($lines, ("BEGIN:VCALENDAR"))) eq 1 and
+        count(index-of($lines, ("BEGIN:VEVENT"))) ge 1 and
+        count(index-of($lines, ("END:VCALENDAR"))) eq 1 and
+        count(index-of($lines, ("END:VEVENT"))) ge 1
     let $events :=
         if($check-sanity) then
             for $line at $pos in $lines
