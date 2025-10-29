@@ -18,5 +18,6 @@ test:suite((
     util:list-functions("http://xquery.weber-gesamtausgabe.de/modules/wega-util-shared-tests"),
     util:list-functions("http://xquery.weber-gesamtausgabe.de/modules/math-tests"),
     util:list-functions("http://xquery.weber-gesamtausgabe.de/modules/geo-tests"),
-    util:list-functions("http://xquery.weber-gesamtausgabe.de/modules/app-shared-tests")
+    util:list-functions("http://xquery.weber-gesamtausgabe.de/modules/app-shared-tests"),
+    util:list-functions("http://xquery.weber-gesamtausgabe.de/modules/ics-tests")
 ))
