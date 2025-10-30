@@ -19,14 +19,16 @@ declare namespace ical="urn:ietf:params:xml:ns:icalendar-2.0";
 declare function ics:parse-ics($text as xs:string) as element(ical:icalendar)? {
     let $unfolded := ics:unfold-lines($text)
     let $lines := tokenize($unfolded, "\r?\n")
-    let $meta :=
-        for $line in subsequence($lines, 2, index-of($lines, "BEGIN:VEVENT")[1] - 2)
-        return ics:parse-ics-line($line)
     let $check-sanity :=
         count(index-of($lines, ("BEGIN:VCALENDAR"))) eq 1 and
         count(index-of($lines, ("BEGIN:VEVENT"))) ge 1 and
         count(index-of($lines, ("END:VCALENDAR"))) eq 1 and
         count(index-of($lines, ("END:VEVENT"))) ge 1
+    let $meta :=
+        if($check-sanity) then
+            for $line in subsequence($lines, 2, index-of($lines, "BEGIN:VEVENT")[1] - 2)
+            return ics:parse-ics-line($line)
+        else ()
     let $events :=
         if($check-sanity) then
             for $line at $pos in $lines
