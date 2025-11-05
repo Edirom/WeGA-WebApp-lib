@@ -149,7 +149,7 @@ declare
 declare 
     %templates:default("wrap", "yes")
     %templates:default("or", "yes")
-    function app-shared:if-not-exists($node as node(), $model as map(*), $key as xs:string, $wrap as xs:string, $or as xs:string) as node()? {
+    function app-shared:if-not-exists($node as node(), $model as map(*), $key as xs:string, $wrap as xs:string, $or as xs:string) as node()* {
         let $tokens := tokenize($key, '\s+')
         return
             if(wega-util-shared:semantic-boolean($or)) then 
