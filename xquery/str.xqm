@@ -175,8 +175,8 @@ declare function str:txtFromTEI($nodes as node()*, $lang as xs:string) as xs:str
  : Sanitize user input
  : cf. http://www.balisage.net/Proceedings/vol7/html/Vlist02/BalisageVol7-Vlist02.html
  :
- : @author Peter Stadler
- : @return xs:string
+ : @param $str the input string
+ : @return the sanitized string
  :)
 declare function str:sanitize($str as xs:string) as xs:string {
 (: Das wird wohl intern schon berücksichtigt?! Jedenfalls bringt die doppelte(?) Kodierung hier nur Probleme    :)
@@ -186,7 +186,9 @@ declare function str:sanitize($str as xs:string) as xs:string {
    else if(contains($str, '<')) then str:sanitize(replace($str, '<', '&amp;lt;'))
    else if(contains($str, '{')) then str:sanitize(replace($str, '{', '{{'))
    else if(contains($str, '}')) then str:sanitize(replace($str, '}', '}}'))
-   else :)$str
+   else :)
+   (: set a maximum length :)
+   fn:substring($str, 1, 64)
 };
 
 (:~
