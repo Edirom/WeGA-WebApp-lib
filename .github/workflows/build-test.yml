@@ -40,8 +40,8 @@ jobs:
           path: xars
       - name: Download additional xar packages
         run: |
-          curl -LsS http://exist-db.org/exist/apps/public-repo/public/functx-1.0.1.xar -o xars/functx-1.0.1.xar
-          curl -LsS http://exist-db.org/exist/apps/public-repo/public/templating-1.0.2.xar -o xars/templating-1.0.2.xar
+          curl -LsS https://exist-db.org/exist/apps/public-repo/public/functx-1.0.1.xar -o xars/functx-1.0.1.xar
+          curl -LsS https://exist-db.org/exist/apps/public-repo/public/templating-1.2.1.xar -o xars/templating-1.0.2.xar
       - name: Create Docker container
         run: |
           docker create --name exist -p 8080:8080 ${{ matrix.DOCKER_IMAGE }}
