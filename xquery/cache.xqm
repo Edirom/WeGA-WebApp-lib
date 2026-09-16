@@ -31,7 +31,7 @@ declare variable $my-cache:UNSUPPORTED_PARAMETER_VALUE_ERROR := QName("http://xq
  :          It takes two arguments as xs:string, the error code and the error description.
  : @return the cached document
  :)
-declare function my-cache:doc($docURI as xs:string, $callback as function() as item(), $callback-params as item()*, $lease as item()?, $onFailure as function() as item()*) as item()* {
+declare function my-cache:doc($docURI as xs:string, $callback as function(item()?) as item(), $callback-params as item()*, $lease as item()?, $onFailure as function(item()?, item()?) as item()*) as item()* {
     let $fileName := functx:substring-after-last($docURI, '/')
     let $collection := functx:substring-before-last($docURI, '/')
     let $currentDateTimeOfFile := 
@@ -44,7 +44,7 @@ declare function my-cache:doc($docURI as xs:string, $callback as function() as i
             ($currentDateTimeOfFile + $lease) lt current-dateTime()
             or empty($currentDateTimeOfFile)
         case empty-sequence() return true() 
-        case function() as xs:boolean return $lease($currentDateTimeOfFile)
+        case function(item()?) as xs:boolean return $lease($currentDateTimeOfFile)
         default return error($my-cache:UNSUPPORTED_PARAMETER_VALUE_ERROR, 'The parameter value for $lease must be xs:dayTimeDuration()? or a function reference which must take exactly one argument.')
     return 
         try {
@@ -90,7 +90,7 @@ declare function my-cache:collection($cacheKey as xs:string, $callback as functi
         else 
             typeswitch($lease)
             case xs:dayTimeDuration return ($dateTimeOfCache + $lease) lt current-dateTime()
-            case function() as xs:boolean return $lease($dateTimeOfCache)
+            case function(item()?) as xs:boolean return $lease($dateTimeOfCache)
             default return error($my-cache:UNSUPPORTED_PARAMETER_VALUE_ERROR, 'The parameter value for $lease must be xs:dayTimeDuration()? or a function reference which must take exactly one argument.')
     return 
         if($updateNecessary) then (
@@ -154,7 +154,7 @@ declare %private function my-cache:store-file($collection as xs:string, $fileNam
         typeswitch($contents)
         case node() return $store()
         case xs:string return $store()
-        case map() return $store-json()
+        case map(*) return $store-json()
         case array(*) return $store-json()
         default return $store-binary()
 };
