@@ -29,6 +29,8 @@ jobs:
             EXIST_AUTODEPLOY: /opt/exist/autodeploy
           - DOCKER_IMAGE: existdb/existdb
             EXIST_AUTODEPLOY: /exist/autodeploy
+          - DOCKER_IMAGE: existdb/existdb:7.0.0-beta5
+            EXIST_AUTODEPLOY: /exist/autodeploy
           - DOCKER_IMAGE: existdb/existdb:5.5.2
             EXIST_AUTODEPLOY: /exist/autodeploy
     
