@@ -16,6 +16,14 @@ import module namespace my-cache="http://xquery.weber-gesamtausgabe.de/modules/c
 declare variable $ct:unique-id := util:uuid();
 
 (:~
+ : The parent collection for the temporary test collection(s).
+ : This collection needs to be created before the tests run. Also, it needs to have write permissions
+ : for the (guest) user that runs the tests. The post-install.xql script takes care of this.
+ :)
+declare variable $ct:test-collection-parent := '/db/WebApp-lib-testfiles';
+declare variable $ct:test-collection := string-join(($ct:test-collection-parent, $ct:unique-id), '/');
+
+(:~
  : Prepare the temporary cache-test collection before the XQSuite module runs.
  :
  : @return the empty sequence
@@ -23,10 +31,9 @@ declare variable $ct:unique-id := util:uuid();
 declare
     %test:setUp
     function ct:set-up() as xs:string? {
-        if (not(xmldb:collection-available('/db/test-cache_' || $ct:unique-id))) then
-            xmldb:create-collection('/db', 'test-cache_' || $ct:unique-id )
-        else
-            ()
+        if (not(xmldb:collection-available($ct:test-collection)))
+        then xmldb:create-collection($ct:test-collection-parent, $ct:unique-id)
+        else ()
 };
 
 (:~
@@ -37,11 +44,9 @@ declare
 declare
     %test:tearDown
     function ct:tear-down() as empty-sequence() {
-        if (xmldb:collection-available('/db/test-cache_' || $ct:unique-id)) then (
-            xmldb:remove('/db/test-cache_' || $ct:unique-id)
-        )
-        else
-            ()
+        if (xmldb:collection-available($ct:test-collection))
+        then xmldb:remove($ct:test-collection)
+        else ()
 };
 
 (:~
@@ -50,7 +55,7 @@ declare
  : @return a path under /db/test-cache/ with a UUID and .xml suffix
  :)
 declare function ct:unique-doc-uri() as xs:string {
-    '/db/test-cache_' || $ct:unique-id || '/' || util:uuid() || '.xml'
+    $ct:test-collection || '/' || util:uuid() || '.xml'
 };
 
 (:~
