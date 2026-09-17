@@ -46,7 +46,7 @@ jobs:
           curl -LsS https://exist-db.org/exist/apps/public-repo/public/templating-1.2.1.xar -o xars/templating-1.0.2.xar
       - name: Create Docker container
         run: |
-          docker create --name exist -p 8080:8080 ${{ matrix.DOCKER_IMAGE }}
+          docker create --name exist -e RUN_WEBAPPLIB_TESTS=true -p 8080:8080 ${{ matrix.DOCKER_IMAGE }}
           for i in xars/*.xar ; do docker cp $i exist:${{ matrix.EXIST_AUTODEPLOY }}/ ; done
       - name: Run Docker container
         run: |
