@@ -40,6 +40,14 @@ declare function local:mkcol($collection, $path) {
 (: store the collection configuration :)
 local:mkcol("/db/system/config", $target),
 
+(: create a collection for test files if the environment variable is set to true :)
+if(environment-variable("RUN_WEBAPPLIB_TESTS") = "true")
+then (
+    xdb:create-collection("/db", "WebApp-lib-testfiles"),
+    sm:chmod(xs:anyURI("/db/WebApp-lib-testfiles"), "rwxrwxrwx")
+)
+else (),
+
 (: store index configuration :)
 xdb:store-files-from-pattern(concat("/system/config", $target), $dir, "**/*.xconf", (), true()),
 
